@@ -1,0 +1,87 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="pg-header">
+        <h1>Notifications</h1>
+        @if (unreadCount() > 0) {
+          <button class="mark-btn" type="button" (click)="markAllRead()">
+            Mark All Read
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Unread banner -->
+    @if (unreadCount() > 0) {
+      <div class="unread-banner" role="status"
+           [attr.aria-label]="unreadCount() + ' unread notifications'">
+        <div class="ub-dot" aria-hidden="true"></div>
+        <p class="ub-text">You have <strong>{{ unreadCount() }}</strong> unread notification{{ unreadCount() !== 1 ? 's' : '' }}</p>
+      </div>
+    }
+
+    <!-- Notification groups -->
+    @for (group of groups(); track group.label) {
+      <div class="time-group">
+        <p class="group-label">{{ group.label }}</p>
+        <div class="n-list" role="list">
+          @for (n of group.items; track n.id) {
+            <div class="n-card"
+                 [class]="cardClass(n)"
+                 role="listitem"
+                 [attr.aria-label]="n.title + (n.unread ? ' — unread' : '')"
+                 (click)="onTap(n)">
+
+              <!-- Icon -->
+              <div class="n-icon" [class]="iconClass(n.type)" aria-hidden="true">
+                @if (n.type === 'booking') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
+                    <rect x="8" y="2" width="8" height="4" rx="1"/>
+                  </svg>
+                } @else if (n.type === 'report') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                } @else if (n.type === 'cancellation') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                  </svg>
+                }
+                @if (n.unread) {
+                  <div class="unread-dot" aria-hidden="true"></div>
+                }
+              </div>
+
+              <!-- Content -->
+              <div class="n-content">
+                <p class="n-title" [class.n-title--bold]="n.unread">{{ n.title }}</p>
+                <p class="n-body">{{ n.body }}</p>
+                <div class="n-time">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  {{ n.time }}
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <div style="height: 100px" aria-hidden="true"></div>
+  </div>
+</ion-content>

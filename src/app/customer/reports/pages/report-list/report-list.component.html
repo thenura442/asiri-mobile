@@ -1,0 +1,197 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="pg-header">
+        <h1>My Reports</h1>
+        @if (!isLoading()) {
+          <p>{{ all().length }} reports · {{ countFor('Ready') }} ready for download</p>
+        }
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- Search -->
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input class="search-input" type="search"
+               placeholder="Search by test name or request ID..."
+               [value]="searchQuery()"
+               (input)="searchQuery.set($any($event.target).value)"
+               aria-label="Search reports"/>
+      </div>
+
+      <!-- Hero: Latest Ready Report -->
+      @if (latestReport()) {
+        <p class="section-label">Latest Report</p>
+        <div class="hero-card" (click)="openDetail(latestReport()!.id)"
+             role="button" [attr.aria-label]="'View report ' + latestReport()!.requestNumber">
+          <div class="hero-accent" aria-hidden="true"></div>
+          <div class="hero-body">
+            <div class="hero-top">
+              <div class="hero-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <polyline points="16 13 12 17 8 13"/>
+                  <line x1="12" y1="17" x2="12" y2="9"/>
+                </svg>
+              </div>
+              <div class="hero-info">
+                <div class="hero-badge">
+                  <i aria-hidden="true"></i>Ready to Download
+                </div>
+                <div class="hero-tests">{{ formatTests(latestReport()!) }}</div>
+                <div class="hero-meta">
+                  <span class="hero-chip">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <rect x="3" y="4" width="18" height="18" rx="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                    </svg>
+                    {{ latestReport()!.dateDisplay }}, 2026
+                  </span>
+                  <span class="hero-chip hero-chip--mono">{{ latestReport()!.requestNumber }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Test pills -->
+            <div class="hero-pills">
+              @for (t of latestReport()!.testNames; track t) {
+                <span class="hero-pill">{{ t }}</span>
+              }
+            </div>
+
+            <!-- CTAs -->
+            <div class="hero-cta">
+              <button class="hero-btn hero-btn--primary" type="button"
+                      (click)="onDownload(latestReport()!.id, $event)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Download PDF</span>
+              </button>
+              <button class="hero-btn hero-btn--secondary" type="button"
+                      (click)="onShare(latestReport()!.id, $event)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="18" cy="5" r="3"/>
+                  <circle cx="6" cy="12" r="3"/>
+                  <circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+                Share
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- All Reports list -->
+      <div class="list-section">
+        <div class="list-header">
+          <span class="list-title">All Reports</span>
+          <span class="list-count">{{ all().length }} reports</span>
+        </div>
+
+        <!-- Filter pills -->
+        <div class="pills" role="tablist" aria-label="Filter reports">
+          @for (f of filters; track f) {
+            <button class="pill" [class.pill--active]="activeFilter() === f"
+                    (click)="activeFilter.set(f)" role="tab"
+                    [attr.aria-selected]="activeFilter() === f" type="button">
+              {{ f }}
+              <span class="pill-count">{{ countFor(f) }}</span>
+            </button>
+          }
+        </div>
+
+        <!-- Report cards -->
+        <div class="report-list" role="list">
+          @for (r of listReports(); track r.id) {
+            <div class="rp-card" role="listitem"
+                 [class.rp-card--ready]="r.status === 'ready'"
+                 [class.rp-card--proc]="r.status === 'processing'"
+                 (click)="openDetail(r.id)"
+                 [attr.aria-label]="r.requestNumber + ' — ' + r.status">
+
+              <div class="rp-icon" [class.rp-icon--ready]="r.status === 'ready'"
+                   [class.rp-icon--proc]="r.status === 'processing'" aria-hidden="true">
+                @if (r.status === 'ready') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <polyline points="16 13 12 17 8 13"/>
+                    <line x1="12" y1="17" x2="12" y2="9"/>
+                  </svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                }
+              </div>
+
+              <div class="rp-info">
+                <div class="rp-name">{{ formatTests(r) }}</div>
+                <div class="rp-sub">
+                  {{ r.dateDisplay }} ·
+                  <span>{{ r.requestNumber }}</span> ·
+                  {{ r.branch }}
+                </div>
+              </div>
+
+              <div class="rp-right">
+                <div class="rp-badge" [class.rp-badge--ready]="r.status === 'ready'"
+                     [class.rp-badge--proc]="r.status === 'processing'">
+                  <i aria-hidden="true"></i>
+                  {{ r.status === 'ready' ? 'Ready' : 'Processing' }}
+                </div>
+                @if (r.status === 'ready') {
+                  <button class="rp-dl" type="button"
+                          (click)="onDownload(r.id, $event)"
+                          aria-label="Download {{ r.requestNumber }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Help card -->
+        <div class="help-card">
+          <div class="help-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div class="help-text">
+            <h4>Need help with a report?</h4>
+            <p>Tap any report to view details, or contact your lab branch for questions.</p>
+          </div>
+          <svg class="help-arrow" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+      </div>
+
+      <div style="height: 100px" aria-hidden="true"></div>
+    </div>
+  </div>
+</ion-content>

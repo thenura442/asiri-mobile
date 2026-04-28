@@ -1,0 +1,126 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- ── Sticky header ─────────────────────────────────────────── -->
+    <div class="sticky-top">
+      <div class="pg-header">
+        <h1>My Bookings</h1>
+      </div>
+
+      <!-- Filter chips -->
+      <div class="filter-chips" role="tablist" aria-label="Filter bookings">
+        @for (tab of tabs; track tab) {
+          <button class="chip"
+                  [class.chip--active]="activeTab() === tab"
+                  role="tab"
+                  [attr.aria-selected]="activeTab() === tab"
+                  (click)="setTab(tab)"
+                  type="button">
+            {{ tab }}
+            <span class="chip-count">{{ countFor(tab) }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- ── Booking list ───────────────────────────────────────────── -->
+    <div class="booking-list" role="list">
+
+      @if (isLoading()) {
+        <!-- Skeleton -->
+        @for (_ of [1,2,3]; track $index) {
+          <div class="skel-card" aria-hidden="true">
+            <div class="skel skel--sm"></div>
+            <div class="skel skel--lg"></div>
+            <div class="skel skel--md"></div>
+          </div>
+        }
+      } @else if (filtered().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
+              <rect x="8" y="2" width="8" height="4" rx="1"/>
+            </svg>
+          </div>
+          <p class="empty-title">No bookings found</p>
+          <p class="empty-desc">
+            @if (activeTab() === 'All') { Book your first lab test to get started. }
+            @else { No {{ activeTab().toLowerCase() }} bookings. }
+          </p>
+          @if (activeTab() === 'All') {
+            <button class="btn-book-new" type="button" (click)="onBookNew()">
+              Book a Test
+            </button>
+          }
+        </div>
+      } @else {
+        @for (b of filtered(); track b.id) {
+          <div class="bk-card"
+               role="listitem"
+               [class.bk-card--active]="isActive(b)"
+               [class.bk-card--enroute]="isEnRoute(b)"
+               (click)="openDetail(b.id)"
+               [attr.aria-label]="b.requestNumber + ' — ' + statusLabel(b.status)">
+
+            <!-- Top row: ID + date + badge -->
+            <div class="bk-top">
+              <div>
+                <div class="bk-id">{{ b.requestNumber }}</div>
+                <div class="bk-date">{{ b.dateDisplay }}</div>
+              </div>
+              <div class="bk-badge" [class]="statusClass(b.status)">
+                <i aria-hidden="true"></i>
+                {{ statusLabel(b.status) }}
+              </div>
+            </div>
+
+            <!-- Test names -->
+            <div class="bk-tests">
+              {{ displayTests(b) }}
+              @if (extraTests(b) > 0) {
+                <span class="bk-extra">+{{ extraTests(b) }} more</span>
+              }
+            </div>
+
+            <!-- Bottom row: location + price -->
+            <div class="bk-bottom">
+              <div class="bk-loc">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" aria-hidden="true">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                {{ b.location }}
+              </div>
+              <div class="bk-price">{{ formatPrice(b.amountLkr) }}</div>
+            </div>
+
+            <!-- Track Live CTA — only for en_route -->
+            @if (isEnRoute(b)) {
+              <button class="bk-track" type="button"
+                      (click)="trackBooking(b.id, $event)"
+                      aria-label="Track live — arriving in {{ b.etaMinutes }} minutes">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" aria-hidden="true">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span>Track Live — Arriving in ~{{ b.etaMinutes }} min</span>
+                <svg class="arrow-icon" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+            }
+
+          </div>
+        }
+      }
+
+      <!-- Bottom spacer for tab bar -->
+      <div style="height: 100px" aria-hidden="true"></div>
+    </div>
+
+  </div>
+</ion-content>

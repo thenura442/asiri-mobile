@@ -1,2 +1,71 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// ── Design tokens — matches all mobile HTML prototypes ────────────────
+
+:root {
+  // Brand
+  --brand:      #002B4C;
+  --brand-d:    #001e36;
+  --brand-l:    #004575;
+
+  // Accent (teal)
+  --accent:     #3FBCB9;
+  --accent-d:   #2d9e9b;
+  --accent-l:   #6dd4d1;
+  --accent-gl:  rgba(63, 188, 185, 0.08);
+
+  // Semantic
+  --success:    #10b981;
+  --error:      #ef4444;
+  --warning:    #f59e0b;
+
+  // Text hierarchy
+  --t1: #ffffff;
+  --t2: rgba(255, 255, 255, 0.8);
+  --t3: rgba(255, 255, 255, 0.5);
+  --t4: rgba(255, 255, 255, 0.28);
+  --t5: rgba(255, 255, 255, 0.15);
+
+  // Easing
+  --ease:        cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+
+  // ── Ionic color overrides ─────────────────────────────────────────
+  --ion-color-primary:              #3FBCB9;
+  --ion-color-primary-rgb:          63, 188, 185;
+  --ion-color-primary-contrast:     #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade:        #2d9e9b;
+  --ion-color-primary-tint:         #6dd4d1;
+
+  --ion-color-secondary:            #002B4C;
+  --ion-color-secondary-rgb:        0, 43, 76;
+  --ion-color-secondary-contrast:   #ffffff;
+  --ion-color-secondary-shade:      #001e36;
+  --ion-color-secondary-tint:       #004575;
+
+  --ion-color-success:              #10b981;
+  --ion-color-success-rgb:          16, 185, 129;
+  --ion-color-success-contrast:     #ffffff;
+  --ion-color-success-shade:        #0d9e6e;
+  --ion-color-success-tint:         #28c08e;
+
+  --ion-color-warning:              #f59e0b;
+  --ion-color-warning-rgb:          245, 158, 11;
+  --ion-color-warning-contrast:     #000000;
+  --ion-color-warning-shade:        #d88b0a;
+  --ion-color-warning-tint:         #f6a823;
+
+  --ion-color-danger:               #ef4444;
+  --ion-color-danger-rgb:           239, 68, 68;
+  --ion-color-danger-contrast:      #ffffff;
+  --ion-color-danger-shade:         #d23b3b;
+  --ion-color-danger-tint:          #f15757;
+
+  --ion-background-color:           #001e36;
+  --ion-background-color-rgb:       0, 30, 54;
+
+  --ion-text-color:                 #ffffff;
+  --ion-text-color-rgb:             255, 255, 255;
+
+  --ion-font-family:                'Plus Jakarta Sans', sans-serif;
+}

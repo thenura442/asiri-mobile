@@ -1,0 +1,197 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="app-header">
+        <button class="back-btn" (click)="goBack()" aria-label="Back to My Job">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        @if (job()) {
+          <div class="header-info">
+            <h1>{{ job()!.requestNumber }}</h1>
+            <p>Job Detail</p>
+          </div>
+          <div class="status-badge status-badge--enroute">
+            <i aria-hidden="true"></i>{{ statusLabel() }}
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (job(); as j) {
+      <div class="main">
+
+        <!-- Patient Information -->
+        <div class="card">
+          <div class="cl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            Patient Information
+          </div>
+
+          <div class="pat-row">
+            <div class="pat-av" aria-hidden="true">{{ j.patient.initials }}</div>
+            <div class="pat-info">
+              <div class="pat-name">
+                {{ j.patient.fullName }}
+                @if (j.patient.flag === 'vip') {
+                  <span class="pat-flag pat-flag--vip">VIP</span>
+                }
+              </div>
+              <div class="pat-meta">
+                {{ j.patient.gender }} · {{ j.patient.ageYears }} years · UHID: {{ j.patient.uhid }}
+              </div>
+            </div>
+          </div>
+
+          <div class="addr-box">
+            {{ j.patient.address }}
+            @if (j.patient.landmark) {
+              <div class="addr-landmark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" aria-hidden="true">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                {{ j.patient.landmark }}
+              </div>
+            }
+          </div>
+
+          <div class="ir"><span class="ir-l">Phone</span><span class="ir-v ir-v--mono">{{ j.patient.phone }}</span></div>
+          @if (j.patient.pendingChargesLkr) {
+            <div class="ir">
+              <span class="ir-l">Pending Charges</span>
+              <span class="ir-v ir-v--amber">{{ formatPrice(j.patient.pendingChargesLkr) }}</span>
+            </div>
+          }
+
+          @if (j.patient.specialInstructions) {
+            <div class="instruct" role="note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" aria-hidden="true">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <p>{{ j.patient.specialInstructions }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- Tests -->
+        <div class="card">
+          <div class="cl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            Tests · {{ j.tests.length }} items
+          </div>
+          @for (t of j.tests; track t.id) {
+            <div class="ti">
+              <div class="ti-info">
+                <div class="ti-name">{{ t.name }}</div>
+                <div class="ti-code">{{ t.code }}</div>
+              </div>
+              <div class="ti-badges">
+                <span class="tib" [class.tib--blood]="t.sampleType === 'blood'"
+                      [class.tib--urine]="t.sampleType === 'urine'">
+                  {{ t.sampleType | titlecase }}
+                </span>
+                @if (t.requiresRx) {
+                  <span class="tib tib--rx">Rx</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Vehicle & Branch -->
+        <div class="card">
+          <div class="cl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M5 17h14v-6l-2-4H7L5 11v6z"/>
+              <circle cx="7.5" cy="17.5" r="1.5"/>
+              <circle cx="16.5" cy="17.5" r="1.5"/>
+            </svg>
+            Vehicle &amp; Branch
+          </div>
+          <div class="ir"><span class="ir-l">Vehicle</span><span class="ir-v ir-v--mono">{{ j.vehicle.plate }}</span></div>
+          <div class="ir"><span class="ir-l">Type</span><span class="ir-v">{{ j.vehicle.model }} · {{ j.vehicle.type }}</span></div>
+          <div class="ir"><span class="ir-l">Branch</span><span class="ir-v">{{ j.vehicle.branch }}</span></div>
+          <div class="ir"><span class="ir-l">Branch Phone</span><span class="ir-v ir-v--mono ir-v--accent">{{ j.vehicle.branchPhone }}</span></div>
+        </div>
+
+        <!-- Price Breakdown -->
+        <div class="card">
+          <div class="cl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+            </svg>
+            Price Breakdown
+          </div>
+          @for (row of j.priceRows; track row.label) {
+            <div class="ir">
+              <span class="ir-l">{{ row.label }}</span>
+              <span class="ir-v ir-v--mono">{{ formatPrice(row.amountLkr) }}</span>
+            </div>
+          }
+          <div class="price-total">
+            <span>Total</span>
+            <strong>{{ formatPrice(j.totalLkr) }}</strong>
+          </div>
+        </div>
+
+        <!-- Status Timeline -->
+        <div class="card">
+          <div class="cl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Status Timeline
+          </div>
+          <div class="timeline" role="list">
+            @for (step of j.timeline; track $index; let last = $last) {
+              <div class="tl-step"
+                   [class.tl-step--active]="step.state === 'active'"
+                   [class.tl-step--upcoming]="step.state === 'upcoming'"
+                   role="listitem">
+                <div class="tl-dot-col">
+                  <div class="tl-dot"
+                       [class.tl-dot--done]="step.state === 'done'"
+                       [class.tl-dot--active]="step.state === 'active'"
+                       [class.tl-dot--upcoming]="step.state === 'upcoming'">
+                  </div>
+                  @if (!last) {
+                    <div class="tl-line"
+                         [class.tl-line--done]="step.state === 'done'"
+                         [class.tl-line--active]="step.state === 'active'"
+                         [class.tl-line--upcoming]="step.state === 'upcoming'"
+                         aria-hidden="true">
+                    </div>
+                  }
+                </div>
+                <div class="tl-info">
+                  <div class="tl-title">{{ step.title }}</div>
+                  @if (step.time) {
+                    <div class="tl-time">{{ step.time }}</div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div style="height: 32px" aria-hidden="true"></div>
+      </div>
+    }
+  </div>
+</ion-content>

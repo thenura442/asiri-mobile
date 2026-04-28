@@ -1,0 +1,176 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="app-header">
+        <button class="back-btn" (click)="goBack()" aria-label="Go back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <span class="header-title">Report Issue</span>
+      </div>
+    </div>
+
+    @if (submitted()) {
+      <!-- Success state -->
+      <div class="success-state">
+        <div class="success-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10b981"
+               stroke-width="2.5" stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h2>Issue Submitted</h2>
+        <p>We've received your report and will respond within 24 hours. Thank you for helping us improve.</p>
+        <button class="btn-home" type="button" (click)="goHome()">Back to Home</button>
+      </div>
+    } @else {
+
+      <div class="content">
+
+        <!-- Header icon -->
+        <div class="issue-header">
+          <div class="ih-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <h1 class="ih-title">Report an Issue</h1>
+          <p class="ih-desc">Tell us what went wrong. We review all reports and respond within 24 hours.</p>
+        </div>
+
+        <!-- Related Booking (optional) -->
+        <div class="form-card">
+          <div class="card-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
+              <rect x="8" y="2" width="8" height="4" rx="1"/>
+            </svg>
+            Related Booking (optional)
+          </div>
+          <div class="booking-options" role="group" aria-label="Select related booking">
+            @for (b of bookings(); track b.id) {
+              <div class="booking-opt"
+                   [class.booking-opt--selected]="selectedBooking() === b.id"
+                   (click)="selectBooking(b.id)"
+                   role="radio"
+                   [attr.aria-checked]="selectedBooking() === b.id">
+                <div class="opt-radio" aria-hidden="true">
+                  <div class="opt-radio-dot"></div>
+                </div>
+                <div class="opt-info">
+                  <div class="opt-id">{{ b.requestNumber }}</div>
+                  <div class="opt-tests">{{ formatTests(b) }}</div>
+                  <div class="opt-date">{{ b.dateDisplay }}</div>
+                </div>
+              </div>
+            }
+            <div class="booking-opt"
+                 [class.booking-opt--selected]="selectedBooking() === 'general'"
+                 (click)="selectBooking('general')"
+                 role="radio"
+                 [attr.aria-checked]="selectedBooking() === 'general'">
+              <div class="opt-radio" aria-hidden="true"><div class="opt-radio-dot"></div></div>
+              <div class="opt-info">
+                <div class="opt-tests" style="margin-top:0">General Issue (not booking-specific)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="form-card">
+          <div class="card-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            Issue Category <span class="req">*</span>
+          </div>
+          <div class="cat-pills" role="group" aria-label="Select issue category">
+            @for (c of categories; track c) {
+              <button class="cat-pill" type="button"
+                      [class.cat-pill--active]="selectedCategory() === c"
+                      (click)="selectCategory(c)"
+                      [attr.aria-pressed]="selectedCategory() === c">
+                {{ c }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-card">
+          <div class="card-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            Describe the Issue <span class="req">*</span>
+          </div>
+          <form [formGroup]="form" novalidate>
+            <textarea class="inp inp--textarea" formControlName="description"
+                      placeholder="Describe your issue in detail..."
+                      (input)="onDescriptionInput($event)"
+                      aria-label="Issue description">
+            </textarea>
+            <div class="char-count" aria-live="polite">{{ charCount() }}/500</div>
+            @if (form.get('description')?.invalid && form.get('description')?.touched) {
+              <span class="field-error" role="alert">Please describe the issue (min 10 characters)</span>
+            }
+          </form>
+        </div>
+
+        <!-- Photo Upload (optional) -->
+        <div class="form-card">
+          <div class="card-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            Attach Photos (optional)
+          </div>
+          <div class="upload-mini">
+            <button class="upload-add" type="button" aria-label="Add photo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              <span>Add</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button class="btn-submit" type="button"
+                (click)="onSubmit()" [disabled]="isLoading()">
+          <span>
+            @if (!isLoading()) {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+              Submit Report
+            } @else {
+              <span class="spinner" aria-label="Submitting"></span>
+            }
+          </span>
+        </button>
+
+        <!-- Response time note -->
+        <div class="response-note" role="note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <p>We'll respond within 24 hours via the contact details on your profile.</p>
+        </div>
+
+        <div style="height: 40px" aria-hidden="true"></div>
+      </div>
+    }
+  </div>
+</ion-content>

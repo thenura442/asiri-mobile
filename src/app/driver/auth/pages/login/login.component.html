@@ -1,0 +1,157 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+
+  <div class="fx" aria-hidden="true">
+    <div class="orb orb--1"></div>
+    <div class="orb orb--2"></div>
+    @for (p of particles; track $index) {
+      <div class="pt" [ngStyle]="particleStyle(p)"></div>
+    }
+  </div>
+
+  <div class="content">
+
+    <!-- Logo row with Driver badge -->
+    <div class="logo-row">
+      <div class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff"
+             stroke-width="2.2" stroke-linecap="round">
+          <path d="M12 3v18"/><path d="M3 12h18"/>
+          <circle cx="12" cy="12" r="5" opacity=".2" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1>Asiri Laboratories</h1>
+        <span>Mobile Service</span>
+      </div>
+      <div class="driver-badge" aria-label="Driver portal">Driver</div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <h2>Driver<br><em>Portal</em></h2>
+      <p>Manage your job assignments, navigate to patients, and update collection statuses.</p>
+    </div>
+
+    <!-- Trust indicators -->
+    <div class="trust" aria-label="Service highlights">
+      <div class="trust-item"><div class="trust-dot" aria-hidden="true"></div><span>GPS Tracking</span></div>
+      <div class="trust-item"><div class="trust-dot" aria-hidden="true"></div><span>Live Status</span></div>
+      <div class="trust-item"><div class="trust-dot" aria-hidden="true"></div><span>Secure</span></div>
+    </div>
+
+    <!-- Form card -->
+    <div class="form-card">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- Phone -->
+        <div class="field-group">
+          <div class="field-row">
+            <label class="field-label" for="d-phone">Phone Number</label>
+          </div>
+          <div class="phone-wrap">
+            <div class="phone-prefix" aria-hidden="true">
+              <span>🇱🇰</span><span>+94</span>
+            </div>
+            <input id="d-phone" type="tel" class="inp inp--phone"
+                   placeholder="7X XXX XXXX" formControlName="phone"
+                   inputmode="tel" autocomplete="tel-national"
+                   [class.inp--error]="phoneInvalid"/>
+          </div>
+          @if (phoneInvalid) {
+            <span class="field-error" role="alert">Enter a valid mobile number</span>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="field-group">
+          <div class="field-row">
+            <label class="field-label" for="d-pw">Password</label>
+            <a href="#" class="field-link" (click)="$event.preventDefault()">Forgot?</a>
+          </div>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+            <input id="d-pw" [type]="showPassword ? 'text' : 'password'"
+                   class="inp" placeholder="Enter password" formControlName="password"
+                   autocomplete="current-password" [class.inp--error]="passwordInvalid"/>
+            <button type="button" class="eye-btn" (click)="togglePassword()"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          @if (passwordInvalid) {
+            <span class="field-error" role="alert">Password must be at least 8 characters</span>
+          }
+        </div>
+
+        <!-- Remember me -->
+        <div class="form-row">
+          <div class="toggle-wrap" (click)="toggleRemember()" role="checkbox"
+               [attr.aria-checked]="rememberMe" tabindex="0"
+               (keydown.space)="toggleRemember()">
+            <div class="toggle-track" [class.toggle-track--on]="rememberMe">
+              <div class="toggle-thumb"></div>
+            </div>
+            <span>Remember me</span>
+          </div>
+        </div>
+
+        <!-- Sign In button -->
+        <button type="submit" class="btn-signin" [disabled]="isLoading"
+                [attr.aria-busy]="isLoading">
+          @if (!isLoading) {
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" aria-hidden="true">
+                <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/>
+                <polyline points="10 17 15 12 10 7"/>
+                <line x1="15" y1="12" x2="3" y2="12"/>
+              </svg>
+              Sign In
+            </span>
+          } @else {
+            <span class="spinner" aria-label="Signing in"></span>
+          }
+        </button>
+
+        <!-- Divider -->
+        <div class="divider" aria-hidden="true"><span>or</span></div>
+
+        <!-- Biometric only (no Google for drivers) -->
+        <button type="button" class="btn-bio" (click)="loginWithBiometric()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.5" aria-hidden="true">
+            <path d="M12 11c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2"/>
+            <path d="M7 11a3 3 0 016 0c0 2.5-3 4-3 4"/>
+            <path d="M4 15.5C2.8 14.2 2 12.7 2 11c0-4.42 4.03-8 9-8"/>
+            <path d="M22 11c0-4.42-4.03-8-9-8"/>
+            <path d="M14.73 14.73C15.65 13.82 16 12.85 16 11c0-2.21-1.79-4-4-4-1.18 0-2.24.51-2.97 1.33"/>
+            <path d="M20 11c0 1.73-.8 3.28-2 4.5"/>
+          </svg>
+          Sign in with Biometrics
+        </button>
+
+      </form>
+    </div>
+
+    <!-- Footer — no register link for drivers -->
+    <div class="footer">
+      <p class="help-text">
+        Driver accounts are managed by your branch.
+        <a href="#">Contact support</a>
+      </p>
+      <div class="sys-status" aria-label="System status">
+        <div class="sys-dot" aria-hidden="true"></div>
+        <span>Asiri Driver Portal &middot; v1.0.0</span>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

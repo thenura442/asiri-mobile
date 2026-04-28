@@ -1,0 +1,104 @@
+:host { display: block; }
+
+.greeting-header {
+  padding: clamp(44px, 12vw, 56px) clamp(16px, 6vw, 24px) 0;
+}
+
+.gh-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.gh-name-wrap {
+  flex: 1;
+}
+
+.gh-greeting {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  margin: 0;
+}
+
+.gh-name {
+  font-size: clamp(22px, 7vw, 28px);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.7px;
+  margin: 3px 0 0;
+  line-height: 1.1;
+
+  em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+}
+
+.gh-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.hdr-btn {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.04);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  transition: background 0.2s;
+  &:active { background: rgba(255, 255, 255, 0.08); }
+  svg { width: 19px; height: 19px; color: rgba(255, 255, 255, 0.5); }
+}
+
+.notif-badge {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 2px solid var(--brand-d);
+}
+
+// ── Stats row ─────────────────────────────────────────────────────────
+.stats-row {
+  display: flex;
+  gap: 8px;
+  margin-top: clamp(14px, 4vw, 18px);
+}
+
+.stat-card {
+  flex: 1;
+  padding: 12px 8px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  strong {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(16px, 5vw, 18px);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+
+  small {
+    display: block;
+    font-size: 8.5px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-top: 2px;
+  }
+}

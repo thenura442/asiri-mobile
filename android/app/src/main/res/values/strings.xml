@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Asiri Mobile</string>
+    <string name="title_activity_main">Asiri Mobile</string>
+    <string name="package_name">com.asiri.mobile</string>
+    <string name="custom_url_scheme">com.asiri.mobile</string>
+</resources>

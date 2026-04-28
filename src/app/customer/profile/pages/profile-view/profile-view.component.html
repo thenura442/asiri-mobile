@@ -1,0 +1,163 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    @if (profile(); as p) {
+      <!-- Profile hero -->
+      <div class="profile-hero">
+        <div class="avatar-wrap">
+          <div class="avatar" aria-label="Profile avatar — {{ p.fullName }}">
+            {{ initials }}
+          </div>
+          <button class="avatar-edit" type="button" (click)="goEdit()"
+                  aria-label="Edit profile photo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+        </div>
+
+        <h1 class="profile-name">{{ p.fullName }}</h1>
+        <p class="profile-phone">{{ p.phone }}</p>
+
+        <div class="profile-badges">
+          <span class="badge badge--uhid">{{ p.uhid }}</span>
+          <span class="badge badge--flag">
+            <i aria-hidden="true"></i>
+            {{ p.flag | titlecase }}
+          </span>
+        </div>
+
+        <button class="edit-btn" type="button" (click)="goEdit()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit Profile
+        </button>
+      </div>
+
+      <!-- Stats mini -->
+      <div class="stats-row" role="list" aria-label="Account statistics">
+        <div class="stat-card" role="listitem">
+          <div class="stat-num">{{ p.totalBookings }}</div>
+          <div class="stat-label">Bookings</div>
+        </div>
+        <div class="stat-card" role="listitem">
+          <div class="stat-num">{{ p.totalReports }}</div>
+          <div class="stat-label">Reports</div>
+        </div>
+        <div class="stat-card" role="listitem">
+          <div class="stat-num">{{ formatAmount(p.totalAmountLkr) }}</div>
+          <div class="stat-label">Spent</div>
+        </div>
+      </div>
+
+      <!-- Account section -->
+      <div class="menu-section">
+        <p class="ms-label">Account</p>
+        <div class="ms-card">
+          <div class="menu-item" (click)="goEdit()">
+            <div class="mi-ico mi-ico--teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="mi-info"><div class="mi-title">Personal Information</div><div class="mi-desc">Name, DOB, blood group</div></div>
+            <div class="mi-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="menu-item" (click)="goEdit()">
+            <div class="mi-ico mi-ico--blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22 6 12 13 2 6"/>
+              </svg>
+            </div>
+            <div class="mi-info"><div class="mi-title">Contact Details</div><div class="mi-desc">Phone, email, address</div></div>
+            <div class="mi-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferences section -->
+      <div class="menu-section">
+        <p class="ms-label">Preferences</p>
+        <div class="ms-card">
+          <div class="menu-item">
+            <div class="mi-ico mi-ico--green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 01-3.46 0"/>
+              </svg>
+            </div>
+            <div class="mi-info"><div class="mi-title">Push Notifications</div><div class="mi-desc">Booking updates, report alerts</div></div>
+            <div class="mi-toggle">
+              <div class="toggle-track" [class.toggle-track--on]="notificationsEnabled()"
+                   (click)="toggleNotifications()" role="switch"
+                   [attr.aria-checked]="notificationsEnabled()" tabindex="0">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+          <div class="menu-item" (click)="goNotifications()">
+            <div class="mi-ico mi-ico--amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="mi-info"><div class="mi-title">Notification History</div><div class="mi-desc">View all past notifications</div></div>
+            <div class="mi-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Support section -->
+      <div class="menu-section">
+        <p class="ms-label">Support</p>
+        <div class="ms-card">
+          <div class="menu-item" (click)="goReportIssue()">
+            <div class="mi-ico mi-ico--amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <div class="mi-info"><div class="mi-title">Report an Issue</div><div class="mi-desc">Problems with bookings or reports</div></div>
+            <div class="mi-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="menu-item">
+            <div class="mi-ico mi-ico--gray">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </div>
+            <div class="mi-info"><div class="mi-title">Terms &amp; Privacy</div></div>
+            <div class="mi-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logout -->
+      <div class="menu-section">
+        <button class="logout-btn" type="button" (click)="onLogout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Log Out
+        </button>
+        <div class="profile-footer">
+          <p class="footer-text">Asiri Mobile v1.0.0 · Asiri Hospitals Group</p>
+        </div>
+      </div>
+
+      <div style="height: 100px" aria-hidden="true"></div>
+    }
+
+  </div>
+</ion-content>

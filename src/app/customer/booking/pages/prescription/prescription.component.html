@@ -1,0 +1,129 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Header -->
+    <div class="app-header">
+      <button class="back-btn" (click)="goBack()" aria-label="Go back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h1>Upload Prescription</h1>
+    </div>
+
+    <div class="content">
+
+      <!-- Blue info card: which tests need Rx -->
+      <div class="info-card" role="note" aria-label="Tests requiring prescription">
+        <div class="info-card__title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Prescription required for:
+        </div>
+        @for (t of rxTests(); track t.id) {
+          <div class="rx-test-row">
+            <div class="rx-dot" aria-hidden="true"></div>
+            <span class="rx-name">{{ t.name }}</span>
+            <span class="rx-code">{{ t.code }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Upload card -->
+      <div class="upload-card">
+        <p class="upload-label">Prescription Photo</p>
+        <p class="upload-desc">Take a clear photo of your doctor's prescription or upload from gallery</p>
+
+        @if (!uploaded()) {
+          <!-- Upload zone -->
+          <button class="upload-zone" type="button" (click)="onUpload()"
+                  aria-label="Take photo or upload prescription">
+            <div class="upload-zone__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+            <h3>Take Photo or Upload</h3>
+            <p>Tap to open camera or select from files</p>
+            <span class="upload-hint">JPG, PNG — max 10MB</span>
+          </button>
+        } @else {
+          <!-- Uploaded preview -->
+          <div class="uploaded-preview" role="status" aria-label="Prescription uploaded">
+            <div class="preview-thumb">
+              <div class="preview-thumb-img" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+              </div>
+              <button class="preview-remove" (click)="removeFile()" aria-label="Remove prescription">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <div class="preview-info">
+              <p class="preview-name">{{ fileName() }}</p>
+              <p class="preview-size">{{ fileSize() }}</p>
+              <div class="preview-status">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.5" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Uploaded
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Photo tips card -->
+      <div class="tips-card">
+        <div class="tips-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          Photo Tips
+        </div>
+        <div class="tip-row">
+          <div class="tip-dot" aria-hidden="true"></div>
+          <span>Place prescription on a flat, well-lit surface</span>
+        </div>
+        <div class="tip-row">
+          <div class="tip-dot" aria-hidden="true"></div>
+          <span>Ensure doctor's name, date, and test names are clearly visible</span>
+        </div>
+        <div class="tip-row">
+          <div class="tip-dot" aria-hidden="true"></div>
+          <span>Avoid shadows and glare on the document</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="btn-actions">
+        <button class="btn-primary" type="button" (click)="onContinue()">
+          <span>
+            Continue
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </span>
+        </button>
+        <button class="btn-skip" type="button" (click)="onSkip()">
+          Skip for now — upload later
+        </button>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

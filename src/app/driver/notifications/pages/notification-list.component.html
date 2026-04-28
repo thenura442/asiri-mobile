@@ -1,0 +1,98 @@
+<!-- <ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="pg-header">
+        <h1>Notifications</h1>
+        @if (unreadCount() > 0) {
+          <button class="mark-btn" type="button" (click)="markAllRead()">
+            Mark All Read
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- Unread banner -->
+      @if (unreadCount() > 0) {
+        <div class="unread-banner" role="status">
+          <div class="ub-dot" aria-hidden="true"></div>
+          <p class="ub-text">
+            You have <strong>{{ unreadCount() }}</strong>
+            unread notification{{ unreadCount() !== 1 ? 's' : '' }}
+          </p>
+        </div>
+      }
+
+      <!-- Alert groups -->
+      @for (group of groups(); track group.label) {
+        <div class="time-group">
+          <p class="group-label">{{ group.label }}</p>
+          <div class="n-list" role="list">
+            @for (n of group.items; track n.id) {
+              <div class="n-card" role="listitem"
+                   [class]="cardTypeClass(n)"
+                   [attr.aria-label]="n.title + (n.unread ? ' — unread' : '')">
+
+                <!-- Icon -->
+                <div class="n-icon" [class]="iconClass(n.type)" aria-hidden="true">
+                  @if (n.type === 'job') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M5 17h14v-6l-2-4H7L5 11v6z"/>
+                      <circle cx="7.5" cy="17.5" r="1.5"/>
+                      <circle cx="16.5" cy="17.5" r="1.5"/>
+                    </svg>
+                  } @else if (n.type === 'done') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                      <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                  } @else if (n.type === 'cancellation') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="15" y1="9" x2="9" y2="15"/>
+                      <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                  } @else if (n.type === 'warning') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="16" x2="12" y2="12"/>
+                      <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                  }
+                  @if (n.unread) {
+                    <div class="unread-dot" aria-hidden="true"></div>
+                  }
+                </div>
+
+                <!-- Content -->
+                <div class="n-content">
+                  <p class="n-title">{{ n.title }}</p>
+                  <p class="n-body">{{ n.body }}</p>
+                  <div class="n-time">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    {{ n.time }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <div style="height: 100px" aria-hidden="true"></div>
+    </div>
+  </div>
+</ion-content> -->

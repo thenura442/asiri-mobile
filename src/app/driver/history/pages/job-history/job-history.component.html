@@ -1,0 +1,93 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="pg-header"><h1>Job History</h1></div>
+    </div>
+
+    <div class="main">
+
+      <!-- Stats row -->
+      @if (!isLoading()) {
+        <div class="stats-row" role="list" aria-label="Job statistics">
+          <div class="stat stat--teal" role="listitem">
+            <strong>{{ stats().today }}</strong>
+            <small>Today</small>
+          </div>
+          <div class="stat stat--green" role="listitem">
+            <strong>{{ stats().thisWeek }}</strong>
+            <small>This Week</small>
+          </div>
+          <div class="stat stat--blue" role="listitem">
+            <strong>{{ stats().thisMonth }}</strong>
+            <small>This Month</small>
+          </div>
+        </div>
+      }
+
+      <!-- Filter chips -->
+      <div class="chips" role="tablist" aria-label="Filter by time period">
+        @for (f of filters; track f) {
+          <button class="chip" [class.chip--active]="activeFilter() === f"
+                  (click)="activeFilter.set(f)" role="tab"
+                  [attr.aria-selected]="activeFilter() === f" type="button">
+            {{ f }}
+          </button>
+        }
+      </div>
+
+      <!-- Job list -->
+      <div class="job-list" role="list">
+        @if (isLoading()) {
+          @for (_ of [1,2,3,4]; track $index) {
+            <div class="skel-card" aria-hidden="true"><div class="skel"></div></div>
+          }
+        } @else {
+          @for (j of filtered(); track j.id) {
+            <div class="job-card" role="listitem"
+                 [class]="outcomeClass(j.outcome)"
+                 [attr.aria-label]="j.patientName + ' — ' + outcomeLabel(j.outcome)">
+
+              <!-- Icon -->
+              <div class="j-icon" aria-hidden="true">
+                @if (j.outcome === 'completed') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                }
+              </div>
+
+              <!-- Info -->
+              <div class="j-info">
+                <div class="j-patient">{{ j.patientName }}</div>
+                <div class="j-meta">
+                  {{ j.testCount }} test{{ j.testCount !== 1 ? 's' : '' }} ·
+                  <span>{{ j.requestNumber }}</span>
+                </div>
+              </div>
+
+              <!-- Right -->
+              <div class="j-right">
+                <div class="j-date">{{ j.dateDisplay }}</div>
+                <div class="j-badge" [class]="badgeClass(j.outcome)">
+                  <i aria-hidden="true"></i>
+                  {{ outcomeLabel(j.outcome) }}
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <div style="height: 100px" aria-hidden="true"></div>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,96 @@
+<div class="home-page">
+
+  <!-- ── Hero background ───────────────────────────────────────────── -->
+  <div class="hero" aria-hidden="true">
+    <div class="hero__grid"></div>
+  </div>
+
+  <!-- ── Hero content ──────────────────────────────────────────────── -->
+  <div class="hero-content">
+    @if (homeData(); as data) {
+      <app-greeting-header
+        [greeting]="greeting"
+        [firstName]="data.profile.firstName"
+        [stats]="data.stats"
+        (notificationsClick)="onNotifications()" />
+
+      @if (data.pendingCharges) {
+        <app-pending-charges-banner [amount]="data.pendingCharges" />
+      }
+    } @else if (isLoading()) {
+      <!-- Skeleton state -->
+      <div class="hero-skeleton" aria-busy="true" aria-label="Loading home data">
+        <div class="skel skel--greeting"></div>
+        <div class="skel skel--stats"></div>
+      </div>
+    }
+
+    <!-- Marketing blurb — always visible -->
+    <div class="hero-mkt" aria-label="Service highlights">
+      <h3>Lab tests at your doorstep</h3>
+      <p>Book from home, track samples in real-time, and receive digital reports instantly.</p>
+      <div class="hero-feats">
+        <div class="hero-feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" aria-hidden="true">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span>Live Tracking</span>
+        </div>
+        <div class="hero-feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>Digital Reports</span>
+        </div>
+        <div class="hero-feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>Secure</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bottom Sheet ───────────────────────────────────────────────── -->
+  <div class="sheet" [class.sheet--open]="sheetOpen()"
+       role="region" aria-label="Bookings and actions">
+
+    <!-- Drag handle (tap to toggle) -->
+    <button class="sheet-handle" (click)="toggleSheet()"
+            [attr.aria-expanded]="sheetOpen()"
+            aria-label="Toggle sheet">
+      <div class="handle-pill" aria-hidden="true"></div>
+    </button>
+
+    <!-- Sheet scrollable content -->
+    <div class="sheet-inner">
+
+      <!-- Active booking card -->
+      @if (homeData()?.activeBooking; as booking) {
+        <app-active-booking-card
+          [booking]="booking"
+          (trackClick)="onTrackBooking(booking.id)" />
+      }
+
+      <!-- Book a Test CTA -->
+      <app-quick-actions (bookNow)="onBookTest()" />
+
+      <!-- Recent bookings -->
+      @if (homeData()?.recentBookings?.length) {
+        <app-recent-bookings-list
+          [bookings]="homeData()!.recentBookings"
+          (viewAll)="onViewAllBookings()" />
+      }
+
+      <!-- Bottom spacer for tab bar clearance -->
+      <div class="sheet-bottom-spacer" aria-hidden="true"></div>
+    </div>
+  </div>
+
+</div>

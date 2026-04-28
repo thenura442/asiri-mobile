@@ -1,0 +1,32 @@
+:host { display: block; }
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: clamp(8px, 3vw, 12px) clamp(16px, 6vw, 24px) 0;
+  padding-top: calc(clamp(8px, 3vw, 12px) + env(safe-area-inset-top, 0px));
+  background: #f4f5f7;
+  flex-shrink: 0;
+}
+
+.back-btn {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  border: 1px solid rgba(0, 43, 76, 0.06);
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0, 43, 76, 0.03);
+  transition: background 0.2s;
+  &:active { background: #f4f5f7; }
+  svg { width: 20px; height: 20px; color: #3d5a73; }
+}
+
+.header-title {
+  font-size: clamp(16px, 4.5vw, 18px);
+  font-weight: 700;
+  color: #0f1c2e;
+  letter-spacing: -0.3px;
+  margin: 0;
+}

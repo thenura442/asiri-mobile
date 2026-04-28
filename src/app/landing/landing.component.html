@@ -1,0 +1,108 @@
+<ion-content [fullscreen]="true" [scrollY]="false">
+  <div class="landing">
+
+    <!-- ── Animated background ───────────────────────────────────── -->
+    <div class="grid-overlay" aria-hidden="true"></div>
+    <div class="orb orb--1"   aria-hidden="true"></div>
+    <div class="orb orb--2"   aria-hidden="true"></div>
+
+    <div class="orbit orbit--1" aria-hidden="true"><div class="orbit__dot"></div></div>
+    <div class="orbit orbit--2" aria-hidden="true"><div class="orbit__dot"></div></div>
+    <div class="orbit orbit--3" aria-hidden="true"></div>
+
+    <div class="particles" aria-hidden="true">
+      @for (p of particles; track $index) {
+        <div class="particle" [ngStyle]="particleStyle(p)"></div>
+      }
+    </div>
+
+    <!-- ── Logo section ──────────────────────────────────────────── -->
+    <div class="logo-section">
+      <div class="logo-wrap" role="img" aria-label="Asiri Laboratories logo">
+        <div class="logo-glow"></div>
+        <div class="logo-bg"></div>
+        <div class="logo-icon">
+          <svg viewBox="0 0 46 46" fill="none" stroke="#fff"
+               stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M23 6v34" opacity=".9"/>
+            <path d="M6 23h34" opacity=".9"/>
+            <path d="M12 12l4 4" opacity=".4"/>
+            <path d="M30 12l4 4" opacity=".4"
+                  transform="scale(-1,1) translate(-46,0)"/>
+            <circle cx="23" cy="23" r="14" opacity=".15" fill="none"/>
+            <circle cx="23" cy="23" r="8"  opacity=".1"
+                    fill="rgba(255,255,255,.05)"
+                    stroke="rgba(255,255,255,.2)" stroke-width="1"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="brand-name">Asiri Laboratories</h1>
+      <p class="brand-sub">Mobile Laboratory Service</p>
+      <div class="brand-line" aria-hidden="true"></div>
+      <p class="tagline">Trusted healthcare, delivered to your doorstep</p>
+    </div>
+
+    <!-- ── Role selection ────────────────────────────────────────── -->
+    <div class="role-section">
+      <p class="role-prompt">Continue as</p>
+
+      <div class="role-cards">
+        <!-- Customer -->
+        <button
+          class="role-card role-card--customer"
+          (click)="goToCustomer()"
+          aria-label="Continue as a Patient">
+          <div class="role-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="role-card__content">
+            <span class="role-card__title">I'm a Patient</span>
+            <span class="role-card__desc">Book tests &amp; view reports</span>
+          </div>
+          <svg class="role-card__arrow" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+
+        <!-- Driver -->
+        <button
+          class="role-card role-card--driver"
+          (click)="goToDriver()"
+          aria-label="Continue as a Driver">
+          <div class="role-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true">
+              <rect x="1" y="3" width="15" height="13" rx="1"/>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+              <circle cx="5.5"  cy="18.5" r="2.5"/>
+              <circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+          </div>
+          <div class="role-card__content">
+            <span class="role-card__title">I'm a Driver</span>
+            <span class="role-card__desc">Manage job assignments</span>
+          </div>
+          <svg class="role-card__arrow" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="landing-footer">
+        <div class="sys-dot" aria-hidden="true"></div>
+        <span>Asiri Hospitals Group &middot; v1.0.0</span>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

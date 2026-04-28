@@ -1,0 +1,77 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="screen">
+
+    <div class="content">
+      <button class="back-btn" (click)="goBack()" aria-label="Go back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+
+      <div class="page-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0110 0v4"/>
+          <circle cx="12" cy="16" r="1"/>
+        </svg>
+      </div>
+
+      <h1 class="page-title">
+        Two-Factor<br><em>Authentication</em>
+      </h1>
+      <p class="page-subtitle">
+        Enter the 6-digit code from your authenticator app to verify your identity.
+      </p>
+
+      <!-- OTP boxes -->
+      <div class="otp-row" role="group" aria-label="6-digit authenticator code">
+        @for (val of otpValues; track $index) {
+          <input
+            #otpInput
+            class="otp-box"
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            placeholder="·"
+            [value]="val"
+            (input)="onInput($event, $index)"
+            (keydown)="onKeydown($event, $index)"
+            [attr.aria-label]="'Digit ' + ($index + 1)"
+          />
+        }
+      </div>
+
+      <!-- Authenticator hint -->
+      <div class="hint-card" role="note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4M12 8h.01"/>
+        </svg>
+        <p>Open Google Authenticator or your preferred TOTP app to get the code.</p>
+      </div>
+
+      <!-- Verify button -->
+      <button class="btn-verify" (click)="onVerify()"
+              [disabled]="isLoading" [attr.aria-busy]="isLoading">
+        @if (!isLoading) {
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+            Verify &amp; Continue
+          </span>
+        } @else {
+          <span class="spinner" aria-label="Verifying"></span>
+        }
+      </button>
+    </div>
+
+    <div class="page-footer">
+      <p>Having trouble? <a href="#">Contact your branch manager</a></p>
+    </div>
+
+  </div>
+</ion-content>

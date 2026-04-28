@@ -1,0 +1,86 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="reg-page">
+
+    <!-- Header -->
+    <div class="reg-header">
+      <button class="back-btn" (click)="goBack()" aria-label="Go back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h1 class="reg-title">Create Account</h1>
+    </div>
+
+    <!-- Stepper -->
+    <div class="stepper" role="progressbar"
+         [attr.aria-valuenow]="currentStep()"
+         aria-valuemin="1" aria-valuemax="3"
+         [attr.aria-label]="'Step ' + currentStep() + ' of 3'">
+
+      <!-- Step 1 -->
+      <div class="step" [class.step--active]="currentStep() === 1"
+           [class.step--done]="currentStep() > 1">
+        <div class="step__dot">
+          @if (currentStep() > 1) {
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff"
+                 stroke-width="3" width="14" height="14" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          } @else {
+            1
+          }
+        </div>
+        <div class="step__line"></div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" [class.step--active]="currentStep() === 2"
+           [class.step--done]="currentStep() > 2"
+           [class.step--upcoming]="currentStep() < 2">
+        <div class="step__dot">
+          @if (currentStep() > 2) {
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff"
+                 stroke-width="3" width="14" height="14" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          } @else {
+            2
+          }
+        </div>
+        <div class="step__line"></div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" [class.step--active]="currentStep() === 3"
+           [class.step--upcoming]="currentStep() < 3">
+        <div class="step__dot">3</div>
+      </div>
+    </div>
+
+    <!-- Step content -->
+    @switch (currentStep()) {
+      @case (1) {
+        <app-register-step1 (next)="onStep1Next($event)" />
+      }
+      @case (2) {
+        <app-register-step2
+          (back)="currentStep.set(1)"
+          (next)="onStep2Next($event)" />
+      }
+      @case (3) {
+        <app-register-step3
+          [isLoading]="isLoading"
+          (back)="currentStep.set(2)"
+          (submitted)="onStep3Submit($event)" />
+      }
+    }
+
+    <!-- Footer — sign in link (always visible) -->
+    <div class="reg-footer">
+      Already have an account?
+      <a routerLink="/customer/auth/login">Sign In</a>
+    </div>
+
+  </div>
+</ion-content>

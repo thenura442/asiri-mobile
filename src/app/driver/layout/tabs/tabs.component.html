@@ -1,0 +1,51 @@
+<div class="driver-shell">
+  <main class="shell-content">
+    <router-outlet/>
+  </main>
+
+  <!-- 4-tab driver nav dock -->
+  <nav class="nav-wrap" aria-label="Driver navigation">
+    <div class="nav-dock">
+      <!-- My Job -->
+      <a class="ni" routerLink="/driver/tabs/my-job" routerLinkActive="ni--active"
+         [attr.aria-label]="tabs[0].ariaLabel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M5 17h14v-6l-2-4H7L5 11v6z"/>
+          <circle cx="7.5" cy="17.5" r="1.5"/>
+          <circle cx="16.5" cy="17.5" r="1.5"/>
+        </svg>
+        <span>My Job</span>
+      </a>
+
+      <!-- History -->
+      <a class="ni" routerLink="/driver/tabs/history" routerLinkActive="ni--active"
+         [attr.aria-label]="tabs[1].ariaLabel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
+          <rect x="8" y="2" width="8" height="4" rx="1"/>
+        </svg>
+        <span>History</span>
+      </a>
+
+      <!-- Alerts -->
+      <a class="ni" routerLink="/driver/tabs/alerts" routerLinkActive="ni--active"
+         [attr.aria-label]="tabs[2].ariaLabel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+        <span>Alerts</span>
+      </a>
+
+      <!-- Profile -->
+      <a class="ni" routerLink="/driver/tabs/profile" routerLinkActive="ni--active"
+         [attr.aria-label]="tabs[3].ariaLabel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Profile</span>
+      </a>
+    </div>
+  </nav>
+</div>

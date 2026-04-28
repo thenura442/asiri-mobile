@@ -1,0 +1,136 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="app-header">
+        <button class="back-btn" (click)="goBack()" aria-label="Go back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <div class="header-text">
+          <h1>Confirm Booking</h1>
+          <p>Review your details before confirming</p>
+        </div>
+        <div class="step-badge" aria-label="Step 5 of 5">Step 5/5</div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- Patient Details -->
+      <div class="summary-card">
+        <div class="card-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Patient Details
+        </div>
+        <div class="info-row"><span class="ir-l">Name</span><span class="ir-v">{{ patient.name }}</span></div>
+        <div class="info-row"><span class="ir-l">Phone</span><span class="ir-v ir-v--mono">{{ patient.phone }}</span></div>
+        @if (location()) {
+          <div class="info-row"><span class="ir-l">Address</span><span class="ir-v">{{ location()!.address }}</span></div>
+        }
+      </div>
+
+      <!-- Tests -->
+      <div class="summary-card">
+        <div class="card-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Tests · {{ selectedTests().length }} item{{ selectedTests().length !== 1 ? 's' : '' }}
+        </div>
+        @for (t of selectedTests(); track t.id) {
+          <div class="test-row">
+            <div class="test-dot" aria-hidden="true"></div>
+            <span class="test-name">{{ t.name }}</span>
+            <span class="test-price">{{ formatPrice(t.priceRs) }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Collection Location -->
+      @if (location()) {
+        <div class="summary-card">
+          <div class="card-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            Collection Location
+          </div>
+          <div class="info-row"><span class="ir-l">Address</span><span class="ir-v">{{ location()!.address }}</span></div>
+          <div class="info-row"><span class="ir-l">City</span><span class="ir-v">{{ location()!.city }}</span></div>
+        </div>
+      }
+
+      <!-- Schedule -->
+      @if (schedule()) {
+        <div class="summary-card">
+          <div class="card-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            Schedule
+          </div>
+          <div class="info-row"><span class="ir-l">Timing</span><span class="ir-v ir-v--accent">{{ formatSchedule() }}</span></div>
+          <div class="info-row"><span class="ir-l">Branch</span><span class="ir-v">{{ schedule()!.branch.name }}</span></div>
+        </div>
+      }
+
+      <!-- Price summary -->
+      <div class="summary-card">
+        <div class="card-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+          </svg>
+          Price Breakdown
+        </div>
+        <div class="info-row"><span class="ir-l">Tests subtotal</span><span class="ir-v ir-v--mono">{{ formatPrice(priceBreakdown().testTotal) }}</span></div>
+        <div class="info-row"><span class="ir-l">Transport fee</span><span class="ir-v ir-v--mono">{{ formatPrice(priceBreakdown().transportFee) }}</span></div>
+        <div class="price-total">
+          <span>Total</span>
+          <strong>{{ formatPrice(priceBreakdown().total) }}</strong>
+        </div>
+      </div>
+
+      <!-- Info note -->
+      <div class="booking-note" role="note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4M12 8h.01"/>
+        </svg>
+        <p>Payment is collected by the driver after sample collection. We accept cash and online transfer.</p>
+      </div>
+
+      <!-- Confirm CTA -->
+      <button class="btn-confirm" type="button"
+              [disabled]="isLoading()"
+              [attr.aria-busy]="isLoading()"
+              (click)="onConfirm()">
+        @if (!isLoading()) {
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            Confirm &amp; Book
+          </span>
+        } @else {
+          <span class="spinner" aria-label="Confirming booking"></span>
+        }
+      </button>
+
+      <div style="height: 32px" aria-hidden="true"></div>
+    </div>
+  </div>
+</ion-content>

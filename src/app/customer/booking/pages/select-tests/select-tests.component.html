@@ -1,0 +1,132 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- ── Sticky toolbar ─────────────────────────────────────────── -->
+    <div class="sticky-toolbar">
+      <!-- Header -->
+      <div class="app-header">
+        <button class="back-btn" (click)="goBack()" aria-label="Go back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <h1>Select Tests</h1>
+      </div>
+
+      <!-- Search -->
+      <div class="search-section">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input class="search-input" type="search" placeholder="Search tests..."
+                 [value]="searchQuery()"
+                 (input)="onSearch($any($event.target).value)"
+                 autocomplete="off" aria-label="Search tests"/>
+        </div>
+      </div>
+
+      <!-- Filter chips -->
+      <div class="filter-chips" role="group" aria-label="Filter by sample type">
+        @for (f of filters; track f) {
+          <button class="chip" [class.chip--active]="activeFilter() === f"
+                  (click)="setFilter(f)" type="button">{{ f }}</button>
+        }
+      </div>
+    </div>
+
+    <!-- ── Test list ───────────────────────────────────────────────── -->
+    <div class="test-list" role="list">
+      @for (test of filteredTests(); track test.id) {
+        <div class="test-card" role="listitem"
+             [class.test-card--selected]="isSelected(test.id)"
+             (click)="toggleTest(test.id)"
+             [attr.aria-pressed]="isSelected(test.id)"
+             [attr.aria-label]="test.name + ' — ' + formatPrice(test.priceRs)">
+
+          <!-- Checkbox -->
+          <div class="tc-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+
+          <!-- Info -->
+          <div class="tc-info">
+            <div class="tc-name">{{ test.name }}</div>
+            <div class="tc-code">{{ test.code }}</div>
+            <div class="tc-meta">
+              <span class="tc-badge" [class.tc-badge--blood]="test.sampleType === 'blood'"
+                    [class.tc-badge--urine]="test.sampleType === 'urine'">
+                {{ test.sampleType | titlecase }}
+              </span>
+              @if (test.requiresPrescription) {
+                <span class="tc-badge tc-badge--rx">Rx Required</span>
+              }
+              <span class="tc-badge tc-badge--time">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                {{ test.turnaround }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="tc-price-wrap">
+            <div class="tc-price-label">Price</div>
+            <div class="tc-price">{{ formatPrice(test.priceRs) }}</div>
+          </div>
+        </div>
+      }
+
+      <!-- Rx note -->
+      @if (hasRxTests()) {
+        <div class="rx-note" role="note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <p>Tests marked <span class="rx-tag">Rx Required</span> need a valid
+            doctor's prescription, uploaded in the next step.</p>
+        </div>
+      }
+
+      <!-- Bottom spacer for bar clearance -->
+      <div style="height: 100px" aria-hidden="true"></div>
+    </div>
+
+  </div>
+
+  <!-- ── Glassmorphic bottom bar ─────────────────────────────────── -->
+  @if (selectedCount() > 0) {
+    <div class="bottom-bar" role="status"
+         [attr.aria-label]="selectedCount() + ' tests selected'">
+      <div class="bb-inner">
+        <div class="bb-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke="#fff">
+            <path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+          </svg>
+        </div>
+        <div class="bb-info">
+          <div class="bb-count">{{ selectedCount() }} test{{ selectedCount() !== 1 ? 's' : '' }} selected</div>
+          <div class="bb-total">Rs. {{ totalPrice().toLocaleString('en-LK') }}</div>
+        </div>
+        <button class="bb-btn" type="button" (click)="onContinue()">
+          <span>Continue
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  }
+
+</ion-content>

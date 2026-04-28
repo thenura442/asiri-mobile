@@ -1,0 +1,314 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="pg-header">
+        <h1>My Job</h1>
+        <button class="online-badge"
+                [class.online-badge--on]="isOnline()"
+                [class.online-badge--off]="!isOnline()"
+                type="button"
+                (click)="toggleOnline()"
+                [attr.aria-label]="isOnline() ? 'Online — tap to go offline' : 'Offline — tap to go online'">
+          <i aria-hidden="true"></i>
+          {{ isOnline() ? 'Online' : 'Offline' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Active Job ─────────────────────────────────────────────── -->
+    @if (job(); as j) {
+      <div class="main">
+
+        <!-- Dark gradient job header card -->
+        <div class="job-hdr" role="banner" [attr.aria-label]="j.requestNumber + ' — ' + statusLabel()">
+          <div class="jh-accent-bar" aria-hidden="true"></div>
+          <div class="jh-glow" aria-hidden="true"></div>
+
+          <div class="jh-row">
+            <div>
+              <div class="jh-id">{{ j.requestNumber }}</div>
+            </div>
+            <div class="jh-badges">
+              @if (j.isUrgent) {
+                <div class="jh-badge jh-badge--urgent">
+                  <i aria-hidden="true"></i>Urgent
+                </div>
+              }
+              <div class="jh-badge jh-badge--status">{{ statusLabel() }}</div>
+            </div>
+          </div>
+
+          <div class="jh-time">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Scheduled: <strong>{{ j.scheduledAt }}</strong>
+          </div>
+
+          <!-- Tap to expand to job detail -->
+          <button class="jh-detail-link" type="button" (click)="onJobDetail()">
+            View Full Detail
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Patient card -->
+        <div class="card">
+          <div class="card-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            Patient
+          </div>
+
+          <div class="pat-row">
+            <div class="pat-av" aria-hidden="true">{{ j.patient.initials }}</div>
+            <div class="pat-info">
+              <div class="pat-name">
+                {{ j.patient.fullName }}
+                <span class="pat-flag"
+                      [class.pat-flag--vip]="j.patient.flag === 'vip'"
+                      [class.pat-flag--reg]="j.patient.flag === 'regular'">
+                  {{ j.patient.flag | uppercase }}
+                </span>
+              </div>
+              <div class="pat-meta">{{ j.patient.gender }} · {{ j.patient.ageYears }} years</div>
+            </div>
+          </div>
+
+          <div class="pat-addr">
+            {{ j.patient.address }}
+            @if (j.patient.landmark) {
+              <div class="pat-landmark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" aria-hidden="true">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                {{ j.patient.landmark }}
+              </div>
+            }
+          </div>
+
+          <!-- Call + WhatsApp -->
+          <div class="pat-actions">
+            <button class="pa-btn pa-btn--call" type="button"
+                    aria-label="Call {{ j.patient.fullName }}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72"/>
+              </svg>
+              Call
+            </button>
+            <button class="pa-btn pa-btn--wa" type="button"
+                    aria-label="WhatsApp {{ j.patient.fullName }}">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.39-1.47-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37s-1.04 1.02-1.04 2.48 1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35z"/>
+              </svg>
+              WhatsApp
+            </button>
+          </div>
+
+          <!-- Special instructions -->
+          @if (j.patient.specialInstructions) {
+            <div class="instruct" role="note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" aria-hidden="true">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <p>{{ j.patient.specialInstructions }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- Tests card -->
+        <div class="card">
+          <div class="card-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            Tests · {{ j.tests.length }} item{{ j.tests.length !== 1 ? 's' : '' }}
+          </div>
+          @for (t of j.tests; track t.id) {
+            <div class="test-item">
+              <div class="ti-info">
+                <div class="ti-name">{{ t.name }}</div>
+                <div class="ti-code">{{ t.code }}</div>
+              </div>
+              <div class="ti-badges">
+                <span class="ti-badge"
+                      [class.ti-badge--blood]="t.sampleType === 'blood'"
+                      [class.ti-badge--urine]="t.sampleType === 'urine'">
+                  {{ sampleTypeLabel(t) }}
+                </span>
+                @if (t.requiresRx) {
+                  <span class="ti-badge ti-badge--rx">Rx</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Vehicle card -->
+        <div class="card">
+          <div class="card-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <path d="M5 17h14v-6l-2-4H7L5 11v6z"/>
+              <circle cx="7.5" cy="17.5" r="1.5"/>
+              <circle cx="16.5" cy="17.5" r="1.5"/>
+            </svg>
+            Vehicle
+          </div>
+          <div class="veh-row">
+            <div class="veh-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M5 17h14v-6l-2-4H7L5 11v6z"/>
+                <circle cx="7.5" cy="17.5" r="1.5"/>
+                <circle cx="16.5" cy="17.5" r="1.5"/>
+              </svg>
+            </div>
+            <div class="veh-info">
+              <div class="veh-plate">{{ j.vehicle.plate }}</div>
+              <div class="veh-meta">{{ j.vehicle.model }} · {{ j.vehicle.type }} · {{ j.vehicle.branch }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTAs -->
+        <div class="cta-area">
+          <button class="btn-nav" type="button" (click)="onNavigate()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Start Navigation</span>
+          </button>
+
+          @if (status() !== 'delivered') {
+            <button class="btn-status" type="button" (click)="onCtaAction()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" aria-hidden="true">
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              <span>{{ ctaConfig().label }}</span>
+            </button>
+          } @else {
+            <div class="job-complete-note" role="status" aria-label="Job completed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              Job Completed — Great work!
+            </div>
+          }
+        </div>
+
+        <div style="height: 120px" aria-hidden="true"></div>
+      </div>
+
+      <!-- Emergency FAB -->
+      <button class="emergency-fab" type="button"
+              (click)="onEmergency()"
+              aria-label="Emergency — tap for help">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                stroke="#fff" stroke-width="2.5"/>
+          <line x1="12" y1="9" x2="12" y2="13" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="12" y1="17" x2="12.01" y2="17" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </button>
+    }
+
+    <!-- ── Empty state (no active job) ──────────────────────────── -->
+    @if (!isLoading() && !job()) {
+      <div class="empty-state">
+
+        <div class="sticky-top">
+          <div class="pg-header">
+            <h1>My Job</h1>
+            <button class="online-badge online-badge--on" type="button"
+                    (click)="toggleOnline()">
+              <i aria-hidden="true"></i>Online
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-body">
+          <div class="empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M5 17h14v-6l-2-4H7L5 11v6z"/>
+              <circle cx="7.5" cy="17.5" r="1.5"/>
+              <circle cx="16.5" cy="17.5" r="1.5"/>
+            </svg>
+          </div>
+          <h2>No Active Job</h2>
+          <p>You're available and ready. Jobs assigned to you by your branch will appear here.</p>
+
+          <!-- Availability card -->
+          <div class="avail-card">
+            <div class="avail-row">
+              <div class="avail-icon avail-icon--on" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <div class="avail-info">
+                <h4>Availability</h4>
+                <div class="avail-status avail-status--on">
+                  <i aria-hidden="true"></i>Available for jobs
+                </div>
+              </div>
+              <div class="avail-toggle" role="switch" aria-checked="true"
+                   (click)="toggleOnline()" tabindex="0">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tips -->
+          <div class="tips">
+            <div class="tip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" aria-hidden="true">
+                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 01-3.46 0"/>
+              </svg>
+              <span>Keep notifications on to receive new job assignments instantly</span>
+            </div>
+            <div class="tip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" aria-hidden="true">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>Make sure your GPS is enabled for accurate location sharing</span>
+            </div>
+            <div class="tip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" aria-hidden="true">
+                <path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+              </svg>
+              <span>Check your kit is fully stocked before heading out</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
+</ion-content>

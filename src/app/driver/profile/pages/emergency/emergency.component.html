@@ -1,0 +1,113 @@
+<div class="modal-page">
+  <!-- Dimmed overlay background -->
+  <div class="overlay" (click)="onCancel()" aria-hidden="true"></div>
+
+  <!-- Bottom sheet -->
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="Emergency Alert">
+    <div class="sheet-handle" aria-hidden="true"></div>
+
+    @if (!submitted()) {
+      <!-- Emergency header -->
+      <div class="em-header">
+        <div class="em-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <h2>Emergency Alert</h2>
+      </div>
+
+      <p class="em-desc">
+        This will immediately notify your branch manager and super admin with your current GPS location.
+      </p>
+
+      <!-- Category selection -->
+      <p class="field-label">What happened?</p>
+      <div class="cats" role="group" aria-label="Select emergency type">
+        @for (c of categories; track c.label) {
+          <button class="cat" type="button"
+                  [class.cat--active]="selectedCategory() === c.label"
+                  (click)="selectCategory(c.label)"
+                  [attr.aria-pressed]="selectedCategory() === c.label">
+            <!-- Icon per category -->
+            @if (c.iconId === 'car') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 17h14v-6l-2-4H7L5 11v6z"/>
+                <circle cx="7.5" cy="17.5" r="1.5"/>
+                <circle cx="16.5" cy="17.5" r="1.5"/>
+              </svg>
+            } @else if (c.iconId === 'alert') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              </svg>
+            } @else if (c.iconId === 'medical') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+            } @else if (c.iconId === 'shield') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+              </svg>
+            }
+            {{ c.label }}
+          </button>
+        }
+      </div>
+
+      <!-- Notes textarea -->
+      <p class="field-label">Additional Details (Optional)</p>
+      <textarea class="notes-input"
+                placeholder="Describe the situation..."
+                (input)="onNotes($any($event.target).value)"
+                rows="3"
+                aria-label="Emergency description">
+      </textarea>
+
+      <!-- GPS note -->
+      <div class="gps-note" role="note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        <p>Your GPS coordinates will be shared automatically with this alert.</p>
+      </div>
+
+      <!-- Actions -->
+      <button class="btn-emergency" type="button"
+              (click)="onSend()" [disabled]="isLoading()"
+              [attr.aria-busy]="isLoading()">
+        @if (!isLoading()) {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          Send Emergency Alert
+        } @else {
+          <span class="spinner" aria-label="Sending alert"></span>
+        }
+      </button>
+      <button class="btn-cancel" type="button" (click)="onCancel()">Cancel</button>
+
+    } @else {
+      <!-- Success state -->
+      <div class="success-state">
+        <div class="success-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h2>Alert Sent</h2>
+        <p>Your branch manager has been notified with your GPS location. Help is on the way.</p>
+        <button class="btn-back" type="button" (click)="onCancel()">Back to My Job</button>
+      </div>
+    }
+  </div>
+</div>

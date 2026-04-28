@@ -1,0 +1,167 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="app-header">
+        <button class="back-btn" (click)="goBack()" aria-label="Go back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <div class="header-text">
+          <h1>Schedule Collection</h1>
+          <p>Choose when your team arrives</p>
+        </div>
+        <div class="step-badge" aria-label="Step 4 of 5">Step 4/5</div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- Assigned Branch -->
+      <p class="sec-label">Assigned Branch</p>
+      <div class="branch-card">
+        <div class="branch-top">
+          <div class="branch-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3z"/>
+            </svg>
+          </div>
+          <div class="branch-info">
+            <div class="branch-name">{{ branch.name }}</div>
+            <div class="branch-dist">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              {{ branch.distKm }} km away
+            </div>
+          </div>
+          <div class="branch-badge" aria-label="Closest branch">Closest</div>
+        </div>
+        <div class="branch-eta">
+          <div class="eta-chip">
+            <strong>~{{ branch.etaMin }} min</strong>
+            <small>Travel ETA</small>
+          </div>
+          <div class="eta-chip">
+            <strong>~{{ branch.totalMin }} min</strong>
+            <small>Total Time</small>
+          </div>
+          <div class="eta-chip">
+            <strong>{{ branch.traffic }}</strong>
+            <small>Traffic Now</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Now / Schedule toggle -->
+      <p class="sec-label">When do you need us?</p>
+      <div class="mode-toggle" role="group" aria-label="Collection timing">
+        <button class="mode-opt" type="button"
+                [class.mode-opt--active]="scheduleMode() === 'now'"
+                (click)="setMode('now')">
+          @if (scheduleMode() === 'now') {
+            <div class="mode-dot" aria-hidden="true"></div>
+          }
+          <div class="mode-icon" [class.mode-icon--active]="scheduleMode() === 'now'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+          </div>
+          <h4>Now</h4>
+          <p>ASAP collection</p>
+        </button>
+
+        <button class="mode-opt" type="button"
+                [class.mode-opt--active]="scheduleMode() === 'scheduled'"
+                (click)="setMode('scheduled')">
+          @if (scheduleMode() === 'scheduled') {
+            <div class="mode-dot" aria-hidden="true"></div>
+          }
+          <div class="mode-icon" [class.mode-icon--active]="scheduleMode() === 'scheduled'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <h4>Schedule</h4>
+          <p>Pick date &amp; time</p>
+        </button>
+      </div>
+
+      <!-- Date + time slot picker (only when scheduled) -->
+      @if (scheduleMode() === 'scheduled') {
+        <div class="sched-card">
+          <!-- Date scroll -->
+          <div class="date-row" role="list" aria-label="Select date">
+            @for (d of dateChips; track d.iso) {
+              <button class="date-chip" type="button" role="listitem"
+                      [class.date-chip--active]="selectedDate() === d.iso"
+                      (click)="selectDate(d.iso)"
+                      [attr.aria-pressed]="selectedDate() === d.iso"
+                      [attr.aria-label]="d.dow + ' ' + d.day + ' ' + d.month">
+                <span class="dow">{{ d.dow }}</span>
+                <span class="day">{{ d.day }}</span>
+                <span class="mon">{{ d.month }}</span>
+              </button>
+            }
+          </div>
+
+          <!-- Time slots -->
+          <p class="time-label">Available Times</p>
+          @if (isLoading()) {
+            <div class="slots-loading" aria-busy="true" aria-label="Loading time slots">
+              @for (_ of [1,2,3,4,5,6]; track $index) {
+                <div class="slot-skel"></div>
+              }
+            </div>
+          } @else {
+            <div class="time-grid" role="list" aria-label="Available time slots">
+              @for (slot of slots(); track slot.time) {
+                <button class="time-slot" type="button" role="listitem"
+                        [class.time-slot--active]="selectedSlot() === slot.time"
+                        [class.time-slot--unavailable]="!slot.available"
+                        [disabled]="!slot.available"
+                        (click)="selectSlot(slot.time)"
+                        [attr.aria-pressed]="selectedSlot() === slot.time"
+                        [attr.aria-label]="slot.time + (slot.available ? '' : ' — unavailable')">
+                  {{ slot.time }}
+                </button>
+              }
+            </div>
+          }
+
+          <!-- ETA note -->
+          @if (selectedSlot()) {
+            <div class="eta-note" role="note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <p>Your driver will arrive around <strong>{{ selectedSlot() }}</strong>. You'll receive an SMS 20 minutes before.</p>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Continue button -->
+      <button class="btn-continue" type="button"
+              [disabled]="!canContinue()"
+              (click)="onContinue()">
+        <span>
+          Continue to Summary
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </span>
+      </button>
+
+      <div style="height: 40px" aria-hidden="true"></div>
+    </div>
+  </div>
+</ion-content>

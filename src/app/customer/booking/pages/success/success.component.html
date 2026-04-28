@@ -1,0 +1,80 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="success-page">
+
+    <!-- Confetti -->
+    <div class="confetti-container" aria-hidden="true">
+      @for (c of confetti; track $index) {
+        <div class="confetti-piece"
+             [style.background]="c.color"
+             [style.left.%]="c.left"
+             [style.animation-delay.s]="c.delay"
+             [style.width.px]="c.w"
+             [style.height.px]="c.h"
+             [style.border-radius]="c.round ? '50%' : '2px'">
+        </div>
+      }
+    </div>
+
+    <!-- Main content -->
+    <div class="success-content">
+
+      <!-- Animated checkmark -->
+      <div class="check-circle" role="img" aria-label="Booking confirmed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#10b981"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+
+      <h1 class="success-title">Booking Confirmed!</h1>
+      <p class="success-desc">
+        Your sample collection has been scheduled. A driver will be assigned shortly.
+      </p>
+
+      <!-- Request number card -->
+      <div class="req-card" role="status" aria-label="Booking reference">
+        <div class="req-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <div>
+          <div class="req-label">Request Number</div>
+          <div class="req-id">{{ requestNumber() }}</div>
+        </div>
+      </div>
+
+      <!-- ETA card -->
+      <div class="eta-card" role="note" aria-label="Estimated arrival time">
+        <div class="eta-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <p class="eta-text">
+          Driver estimated to arrive in
+          <strong>~{{ etaMinutes() }} minutes</strong>.
+          You'll receive an SMS confirmation.
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="success-actions">
+        <button class="btn-track" type="button" (click)="onTrack()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" aria-hidden="true">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Track My Booking
+        </button>
+        <button class="btn-home" type="button" (click)="onHome()">
+          Back to Home
+        </button>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

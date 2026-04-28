@@ -1,0 +1,135 @@
+<ion-content [fullscreen]="true" [scrollY]="false">
+  <div class="location-page">
+
+    <!-- Floating header over map -->
+    <div class="map-header">
+      <button class="back-btn" (click)="goBack()" aria-label="Go back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <div class="search-bar" role="search" aria-label="Search location">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <span>Search address or place...</span>
+      </div>
+    </div>
+
+    <!-- Branch distance badge -->
+    <div class="branch-badge" role="status" aria-label="Nearest branch distance">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" aria-hidden="true">
+        <path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3z"/>
+      </svg>
+      Asiri Central · <strong>2.3 km</strong>
+    </div>
+
+    <!-- CSS map (Leaflet placeholder) -->
+    <div class="map-area" role="img" aria-label="Map showing collection location">
+      <!-- Road grid -->
+      <div class="map-roads" aria-hidden="true">
+        <div class="road road--h" style="top:20%"></div>
+        <div class="road road--h" style="top:40%"></div>
+        <div class="road road--h road--main" style="top:48%"></div>
+        <div class="road road--h" style="top:60%"></div>
+        <div class="road road--h" style="top:80%"></div>
+        <div class="road road--v" style="left:15%"></div>
+        <div class="road road--v" style="left:38%"></div>
+        <div class="road road--v road--main" style="left:50%"></div>
+        <div class="road road--v" style="left:62%"></div>
+        <div class="road road--v" style="left:85%"></div>
+      </div>
+      <!-- Blocks -->
+      <div class="map-block" style="width:50px;height:35px;top:24%;left:20%" aria-hidden="true"></div>
+      <div class="map-block" style="width:65px;height:45px;top:28%;left:44%" aria-hidden="true"></div>
+      <div class="map-block" style="width:40px;height:55px;top:52%;left:18%" aria-hidden="true"></div>
+      <div class="map-block" style="width:55px;height:38px;top:62%;left:68%" aria-hidden="true"></div>
+      <!-- Labels -->
+      <div class="map-label" style="top:15%;left:6%" aria-hidden="true">Kirulapone</div>
+      <div class="map-label" style="top:72%;left:52%" aria-hidden="true">Colombo 07</div>
+      <div class="map-label" style="top:32%;left:72%" aria-hidden="true">Flower Rd</div>
+      <!-- Center pin -->
+      <div class="map-pin" aria-label="Selected location">
+        <div class="pin-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="pin-tail" aria-hidden="true"></div>
+        <div class="pin-shadow" aria-hidden="true"></div>
+      </div>
+      <!-- GPS button -->
+      <button class="gps-btn" type="button" (click)="useCurrentLocation()"
+              aria-label="Use current location">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+          <circle cx="12" cy="12" r="4"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Bottom sheet -->
+    <div class="bottom-sheet">
+      <div class="sheet-handle" aria-hidden="true"></div>
+
+      <!-- Saved addresses -->
+      <p class="sheet-label">Saved Addresses</p>
+      <div class="addr-chips" role="list" aria-label="Saved addresses">
+        @for (addr of savedAddresses; track addr.id) {
+          <button class="addr-chip" role="listitem" type="button"
+                  [class.addr-chip--active]="selectedAddress()?.id === addr.id"
+                  (click)="selectAddress(addr)"
+                  [attr.aria-pressed]="selectedAddress()?.id === addr.id">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <div>
+              <div class="chip-name">{{ addr.label }}</div>
+              <div class="chip-sub">{{ addr.city }}</div>
+            </div>
+          </button>
+        }
+      </div>
+
+      <!-- Selected address display -->
+      @if (selectedAddress()) {
+        <div class="selected-addr" role="status" aria-label="Selected collection address">
+          <div class="sel-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="sel-info">
+            <h4>{{ selectedAddress()!.address }}</h4>
+            <p>{{ selectedAddress()!.city }}</p>
+          </div>
+          <button class="sel-edit" type="button" aria-label="Edit address">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+        </div>
+      }
+
+      <!-- Confirm button -->
+      <button class="btn-confirm" type="button"
+              [disabled]="!selectedAddress()"
+              (click)="onConfirm()">
+        <span>
+          Confirm Location
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+  </div>
+</ion-content>

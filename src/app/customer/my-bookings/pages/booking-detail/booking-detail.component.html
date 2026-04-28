@@ -1,0 +1,221 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="app-header">
+        <button class="back-btn" (click)="goBack()" aria-label="Go back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        @if (detail()) {
+          <div class="header-info">
+            <div class="header-id">{{ detail()!.requestNumber }}</div>
+            <div class="header-date">{{ detail()!.dateDisplay }}</div>
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="loading-state" aria-busy="true" aria-label="Loading booking details">
+        @for (_ of [1,2,3]; track $index) {
+          <div class="skel-card"><div class="skel"></div><div class="skel skel--sm"></div></div>
+        }
+      </div>
+    } @else if (detail(); as d) {
+
+      <div class="content">
+
+        <!-- Status hero -->
+        <div class="status-hero">
+          <div class="sh-badge" [class.sh-badge--enroute]="d.status === 'en_route'">
+            @if (d.status === 'en_route') { <div class="sh-pulse" aria-hidden="true"></div> }
+            {{ d.status === 'en_route' ? 'En Route' : d.status | titlecase }}
+          </div>
+          @if (d.status === 'en_route') {
+            <p class="sh-text">
+              Your collection team is <strong>on the way</strong>.<br>
+              Estimated arrival in <strong>~{{ d.etaMinutes }} minutes</strong>
+            </p>
+            <button class="btn-track" type="button" (click)="onTrack()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Track Live
+            </button>
+          } @else {
+            <p class="sh-text">Status: <strong>{{ d.status }}</strong></p>
+          }
+        </div>
+
+        <!-- Tests card -->
+        <div class="detail-card">
+          <div class="dc-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+            </svg>
+            Requested Tests
+          </div>
+          @for (t of d.tests; track t.id) {
+            <div class="test-item">
+              <div class="ti-ico" [class.ti-ico--blood]="t.sampleType === 'blood'"
+                   [class.ti-ico--urine]="t.sampleType === 'urine'" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>
+                </svg>
+              </div>
+              <div class="ti-info">
+                <div class="ti-name">{{ t.name }}</div>
+                <div class="ti-code">{{ t.code }} · {{ t.sampleType | titlecase }}</div>
+              </div>
+              <div class="ti-badge" [class.ti-badge--pending]="t.status === 'pending'"
+                   [class.ti-badge--collected]="t.status === 'collected'">
+                {{ t.status | titlecase }}
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Timeline card -->
+        <div class="detail-card">
+          <div class="dc-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Journey Timeline
+          </div>
+          <div class="timeline" role="list">
+            @for (step of d.timeline; track $index; let last = $last) {
+              <div class="tl-step"
+                   [class.tl-step--active]="step.state === 'active'"
+                   [class.tl-step--upcoming]="step.state === 'upcoming'"
+                   role="listitem">
+                <div class="tl-dot-col">
+                  <div class="tl-dot"
+                       [class.tl-dot--done]="step.state === 'done'"
+                       [class.tl-dot--active]="step.state === 'active'"
+                       [class.tl-dot--upcoming]="step.state === 'upcoming'"
+                       [attr.aria-label]="step.state">
+                  </div>
+                  @if (!last) {
+                    <div class="tl-line"
+                         [class.tl-line--done]="step.state === 'done'"
+                         [class.tl-line--active]="step.state === 'active'"
+                         [class.tl-line--upcoming]="step.state === 'upcoming'"
+                         aria-hidden="true">
+                    </div>
+                  }
+                </div>
+                <div class="tl-info">
+                  <div class="tl-title">{{ step.title }}</div>
+                  @if (step.time) {
+                    <div class="tl-time">{{ step.time }}</div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Driver card -->
+        @if (d.driver) {
+          <div class="detail-card">
+            <div class="dc-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 17h14v-6l-2-4H7L5 11v6z"/>
+                <circle cx="7.5" cy="17.5" r="1.5"/>
+                <circle cx="16.5" cy="17.5" r="1.5"/>
+              </svg>
+              Driver &amp; Vehicle
+            </div>
+            <div class="driver-row">
+              <div class="dr-avatar" aria-hidden="true">{{ d.driver.initials }}</div>
+              <div class="dr-info">
+                <div class="dr-name">{{ d.driver.name }}</div>
+                <div class="dr-meta">
+                  {{ d.driver.vehicleModel }} ·
+                  <span>{{ d.driver.vehiclePlate }}</span>
+                </div>
+              </div>
+              <button class="dr-call" type="button" aria-label="Call driver">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Price breakdown -->
+        <div class="detail-card">
+          <div class="dc-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+            </svg>
+            Price Breakdown
+          </div>
+          <div class="price-row">
+            <span class="pr-l">{{ d.price.baseLabel }}</span>
+            <span class="pr-v">{{ formatPrice(d.price.baseAmount) }}</span>
+          </div>
+          <div class="price-row">
+            <span class="pr-l">{{ d.price.distLabel }}</span>
+            <span class="pr-v">{{ formatPrice(d.price.distAmount) }}</span>
+          </div>
+          <div class="price-row">
+            <span class="pr-l">Transport fee</span>
+            <span class="pr-v pr-v--faint">{{ formatPrice(d.price.transportFee) }}</span>
+          </div>
+          <div class="price-divider" aria-hidden="true"></div>
+          <div class="price-total">
+            <span>Total</span>
+            <strong>{{ formatPrice(d.price.total) }}</strong>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="detail-card">
+          <div class="dc-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            Collection Location
+          </div>
+          <p class="location-addr">{{ d.location }}</p>
+          <p class="location-dist">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+              <circle cx="12" cy="12" r="4"/>
+            </svg>
+            {{ d.locationDistKm }} km from Asiri Central Lab
+          </p>
+        </div>
+
+        <!-- Actions -->
+        @if (isEnRoute() || canCancel()) {
+          <div class="detail-actions">
+            <button class="btn-secondary" type="button" (click)="onReportIssue()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              </svg>
+              Report Issue
+            </button>
+            @if (canCancel()) {
+              <button class="btn-danger" type="button" (click)="onCancel()">
+                Cancel Booking
+              </button>
+            }
+          </div>
+        }
+
+        <div style="height: 32px" aria-hidden="true"></div>
+      </div>
+    }
+  </div>
+</ion-content>

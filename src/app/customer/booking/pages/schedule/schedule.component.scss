@@ -1,0 +1,80 @@
+:host { display: block; height: 100%; }
+ion-content { --background: #f4f5f7; }
+
+.page { display: flex; flex-direction: column; min-height: 100%; }
+
+// ── Sticky header ─────────────────────────────────────────────────────
+.sticky-top {
+  position: sticky; top: 0; z-index: 99;
+  background: rgba(244,245,247,.88);
+  -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(0,43,76,.04);
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.app-header { padding: clamp(8px,3vw,10px) clamp(16px,6vw,24px) clamp(10px,3vw,14px); display: flex; align-items: center; gap: 12px; }
+.back-btn { width: 42px; height: 42px; border-radius: 13px; border: 1px solid rgba(0,43,76,.06); background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,43,76,.03); transition: background .2s; &:active { background: #f0f2f5; } svg { width: 20px; height: 20px; color: #3d5a73; } }
+.header-text { flex: 1; h1 { font-size: clamp(15px,4.2vw,18px); font-weight: 700; color: #0f1c2e; margin: 0; } p { font-size: 11px; color: #94a7b8; margin: 1px 0 0; } }
+.step-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: #3FBCB9; padding: 4px 10px; background: rgba(63,188,185,.06); border: 1px solid rgba(63,188,185,.08); border-radius: 7px; white-space: nowrap; }
+
+.main { padding: 16px clamp(16px,6vw,24px) 20px; }
+
+.sec-label { font-size: 10px; font-weight: 700; color: #94a7b8; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; &::after { content: ''; flex: 1; height: 1px; background: rgba(0,43,76,.05); } }
+
+// ── Branch card ───────────────────────────────────────────────────────
+.branch-card { background: #fff; border-radius: 20px; padding: 18px; box-shadow: 0 2px 8px rgba(0,43,76,.04), 0 6px 20px rgba(0,43,76,.03); border: 1px solid rgba(0,43,76,.04); margin-bottom: 20px; position: relative; &::before { content: ''; position: absolute; inset: 0; border-radius: 20px; border-top: 1px solid rgba(255,255,255,.8); pointer-events: none; } }
+.branch-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.branch-icon { width: 42px; height: 42px; border-radius: 12px; background: rgba(63,188,185,.06); border: 1px solid rgba(63,188,185,.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0; svg { width: 18px; height: 18px; color: #3FBCB9; } }
+.branch-info { flex: 1; }
+.branch-name { font-size: 14px; font-weight: 700; color: #0f1c2e; }
+.branch-dist { font-size: 11px; color: #6b8299; margin-top: 2px; display: flex; align-items: center; gap: 4px; svg { width: 11px; height: 11px; color: #3FBCB9; } }
+.branch-badge { padding: 4px 10px; border-radius: 7px; font-size: 9px; font-weight: 700; color: #10b981; background: rgba(16,185,129,.06); border: 1px solid rgba(16,185,129,.08); white-space: nowrap; }
+.branch-eta { display: flex; gap: 8px; padding-top: 12px; border-top: 1px solid rgba(0,43,76,.04); }
+.eta-chip { flex: 1; padding: 10px; border-radius: 12px; background: #fafbfc; border: 1px solid rgba(0,43,76,.04); text-align: center; strong { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: #0f1c2e; display: block; } small { font-size: 9px; color: #94a7b8; text-transform: uppercase; font-weight: 600; letter-spacing: .5px; display: block; margin-top: 2px; } }
+
+// ── Mode toggle ───────────────────────────────────────────────────────
+.mode-toggle { display: flex; gap: 8px; margin-bottom: 20px; }
+.mode-opt {
+  flex: 1; padding: 16px; border-radius: 16px;
+  background: #fff; border: 1.5px solid rgba(0,43,76,.06);
+  box-shadow: 0 1px 4px rgba(0,43,76,.03);
+  cursor: pointer; text-align: center; transition: .2s;
+  position: relative; font-family: inherit;
+  &--active { border-color: #3FBCB9; background: rgba(63,188,185,.03); box-shadow: 0 0 0 3px rgba(63,188,185,.06); }
+  h4 { font-size: 13px; font-weight: 700; color: #0f1c2e; margin: 0; }
+  p  { font-size: 10.5px; color: #94a7b8; margin: 2px 0 0; }
+  &--active h4 { color: #3FBCB9; }
+}
+.mode-dot { position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%; background: #3FBCB9; }
+.mode-icon { width: 36px; height: 36px; border-radius: 10px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: #fafbfc; border: 1px solid rgba(0,43,76,.04); svg { width: 18px; height: 18px; color: #94a7b8; } &--active { background: rgba(63,188,185,.08); border-color: rgba(63,188,185,.1); svg { color: #3FBCB9; } } }
+
+// ── Schedule card ─────────────────────────────────────────────────────
+.sched-card { background: #fff; border-radius: 20px; padding: 18px; box-shadow: 0 2px 8px rgba(0,43,76,.04), 0 6px 20px rgba(0,43,76,.03); border: 1px solid rgba(0,43,76,.04); margin-bottom: 20px; position: relative; &::before { content: ''; position: absolute; inset: 0; border-radius: 20px; border-top: 1px solid rgba(255,255,255,.8); pointer-events: none; } }
+
+// Date chips
+.date-row { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; &::-webkit-scrollbar { display: none; } scrollbar-width: none; }
+.date-chip { min-width: 56px; padding: 10px 8px; border-radius: 14px; border: 1.5px solid rgba(0,43,76,.06); background: #fafbfc; text-align: center; cursor: pointer; transition: .2s; flex-shrink: 0; font-family: inherit; &--active { background: #3FBCB9; border-color: #3FBCB9; .dow,.day,.mon { color: #fff; } } }
+.dow  { font-size: 9px; font-weight: 600; color: #94a7b8; text-transform: uppercase; letter-spacing: .5px; display: block; }
+.day  { font-family: 'JetBrains Mono', monospace; font-size: clamp(16px,5vw,18px); font-weight: 700; color: #0f1c2e; margin-top: 2px; display: block; }
+.mon  { font-size: 9px; font-weight: 600; color: #94a7b8; margin-top: 1px; display: block; }
+
+// Time slots
+.time-label { font-size: 11px; font-weight: 600; color: #6b8299; margin-bottom: 8px; }
+.time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.time-slot {
+  padding: 11px 8px; border-radius: 12px; border: 1.5px solid rgba(0,43,76,.06);
+  background: #fafbfc; text-align: center; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+  color: #3d5a73; transition: .2s;
+  &--active { background: #002B4C; border-color: #002B4C; color: #fff; box-shadow: 0 2px 8px rgba(0,43,76,.12); }
+  &--unavailable { color: #bcc8d4; border-style: dashed; cursor: not-allowed; }
+}
+
+// Skeleton
+.slots-loading { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.slot-skel { height: 40px; border-radius: 12px; background: linear-gradient(90deg, #f0f2f5 25%, #e8eaed 50%, #f0f2f5 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+.eta-note { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; background: rgba(63,188,185,.04); border: 1px solid rgba(63,188,185,.06); margin-top: 16px; svg { width: 18px; height: 18px; color: #3FBCB9; flex-shrink: 0; } p { font-size: 12px; color: #3d5a73; line-height: 1.4; font-weight: 500; margin: 0; } strong { font-family: 'JetBrains Mono', monospace; color: #3FBCB9; font-weight: 700; } }
+
+.btn-continue { width: 100%; padding: clamp(14px,4vw,16px); border-radius: 16px; font-family: inherit; font-size: clamp(14px,3.8vw,15px); font-weight: 700; cursor: pointer; border: none; background: linear-gradient(135deg,#3FBCB9,#2d9e9b); color: #fff; box-shadow: 0 4px 16px rgba(63,188,185,.2); position: relative; overflow: hidden; transition: transform .2s; &::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg,transparent 30%,rgba(255,255,255,.12)); } &::after { content: ''; position: absolute; inset: 1px; border-radius: 15px; border-top: 1px solid rgba(255,255,255,.2); pointer-events: none; } &:active:not(:disabled) { transform: scale(.98); } &:disabled { opacity: .5; cursor: not-allowed; } span { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 8px; svg { width: 18px; height: 18px; } } }

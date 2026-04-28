@@ -1,0 +1,148 @@
+<ion-content [fullscreen]="true" [scrollY]="true">
+  <div class="page">
+
+    <!-- Sticky header -->
+    <div class="sticky-top">
+      <div class="app-header">
+        <button class="back-btn" (click)="goBack()" aria-label="Back to My Job">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <div class="header-info">
+          <h1>Sample Collection</h1>
+          <p>{{ requestNum() }} · {{ patientName() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- Summary chips -->
+      <div class="summary-row" role="status"
+           [attr.aria-label]="collectedCount() + ' collected, ' + failedCount() + ' failed'">
+        <div class="sum-chip sum-chip--total">
+          <strong>{{ entries().length }}</strong>
+          <small>Total</small>
+        </div>
+        <div class="sum-chip sum-chip--done">
+          <strong>{{ collectedCount() }}</strong>
+          <small>Collected</small>
+        </div>
+        <div class="sum-chip sum-chip--fail">
+          <strong>{{ failedCount() }}</strong>
+          <small>Failed</small>
+        </div>
+      </div>
+
+      <!-- Test cards -->
+      @for (entry of entries(); track entry.test.id; let i = $index) {
+        <div class="test-card"
+             [class.test-card--collected]="entry.outcome === 'collected'"
+             [class.test-card--failed]="entry.outcome === 'failed'">
+
+          <!-- Test info -->
+          <div class="tc-top">
+            <div class="tc-info">
+              <div class="tc-name">{{ entry.test.name }}</div>
+              <div class="tc-code">{{ entry.test.code }}</div>
+              <div class="tc-badges">
+                <span class="tc-badge"
+                      [class.tc-badge--blood]="entry.test.sampleType === 'blood'"
+                      [class.tc-badge--urine]="entry.test.sampleType === 'urine'">
+                  {{ entry.test.sampleType | titlecase }}
+                </span>
+                @if (entry.test.requiresRx) {
+                  <span class="tc-badge tc-badge--rx">Rx</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Collected / Failed toggles -->
+          <div class="tc-toggles" role="group"
+               [attr.aria-label]="'Collection status for ' + entry.test.name">
+            <button class="tc-tog tc-tog--ok"
+                    [class.tc-tog--on]="entry.outcome === 'collected'"
+                    type="button"
+                    (click)="setOutcome(i, 'collected')"
+                    [attr.aria-pressed]="entry.outcome === 'collected'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              Collected
+            </button>
+            <button class="tc-tog tc-tog--fail"
+                    [class.tc-tog--on]="entry.outcome === 'failed'"
+                    type="button"
+                    (click)="setOutcome(i, 'failed')"
+                    [attr.aria-pressed]="entry.outcome === 'failed'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              Failed
+            </button>
+          </div>
+
+          <!-- Fail reason section (only shows when failed) -->
+          @if (entry.outcome === 'failed') {
+            <div class="fail-section">
+              <p class="fail-label">Reason</p>
+              <select class="fail-select"
+                      [value]="entry.failReason"
+                      (change)="setFailReason(i, $any($event.target).value)"
+                      aria-label="Select failure reason">
+                <option value="" disabled selected>Select reason</option>
+                @for (r of failReasons; track r) {
+                  <option [value]="r">{{ r }}</option>
+                }
+              </select>
+              <textarea class="fail-notes"
+                        placeholder="Additional notes (optional)"
+                        [value]="entry.notes"
+                        (input)="setNotes(i, $any($event.target).value)"
+                        rows="3"
+                        aria-label="Additional notes">
+              </textarea>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Warning if any tests failed -->
+      @if (failedCount() > 0) {
+        <div class="warn-note" role="alert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" aria-hidden="true">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <p>{{ failedCount() }} test{{ failedCount() !== 1 ? 's' : '' }} could not be collected. This will be reported to the branch.</p>
+        </div>
+      }
+
+      <!-- Confirm button -->
+      <button class="btn-confirm" type="button"
+              (click)="onConfirm()"
+              [disabled]="isLoading() || !allDecided()"
+              [attr.aria-busy]="isLoading()">
+        @if (!isLoading()) {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" aria-hidden="true">
+            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <span>Confirm &amp; Complete Collection</span>
+        } @else {
+          <span class="spinner" aria-label="Submitting"></span>
+        }
+      </button>
+
+      <div style="height: 40px" aria-hidden="true"></div>
+    </div>
+  </div>
+</ion-content>

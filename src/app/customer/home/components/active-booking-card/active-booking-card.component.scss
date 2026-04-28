@@ -1,0 +1,164 @@
+:host { display: block; margin-bottom: 16px; }
+
+// ── Card ──────────────────────────────────────────────────────────────
+.booking-card {
+  border-radius: 22px;
+  padding: clamp(16px, 5vw, 20px);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0d2137, #0f2a45, #112d4a);
+  border: 1px solid rgba(63, 188, 185, 0.1);
+  box-shadow:
+    0 4px 12px rgba(0, 20, 40, 0.15),
+    0 12px 32px rgba(0, 20, 40, 0.1),
+    0 0 0 1px rgba(63, 188, 185, 0.04);
+
+  // Teal top accent line
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-l), var(--accent));
+  }
+
+  // Subtle corner glow
+  &::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(63, 188, 185, 0.06), transparent 70%);
+    pointer-events: none;
+  }
+}
+
+// ── Header row ────────────────────────────────────────────────────────
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.status-pulse {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(63, 188, 185, 0.4);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.status-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.request-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(63, 188, 185, 0.5);
+  padding: 4px 10px;
+  background: rgba(63, 188, 185, 0.06);
+  border-radius: 6px;
+  border: 1px solid rgba(63, 188, 185, 0.08);
+}
+
+// ── Test names ────────────────────────────────────────────────────────
+.test-names {
+  font-size: clamp(13px, 3.8vw, 15px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.35;
+}
+
+.extra {
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+// ── Meta chips ────────────────────────────────────────────────────────
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 3.5vw, 14px);
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+
+  svg { width: 12px; height: 12px; color: rgba(63, 188, 185, 0.5); }
+}
+
+// ── Progress bar ──────────────────────────────────────────────────────
+.progress-bar {
+  display: flex;
+  align-items: center;
+  margin: clamp(12px, 4vw, 16px) 4px 14px;
+}
+
+.prog-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &--done     { background: #10b981; }
+  &--active   { background: var(--accent); box-shadow: 0 0 8px rgba(63,188,185,0.4); animation: pulse 1.5s ease-in-out infinite; }
+  &--upcoming { background: rgba(255, 255, 255, 0.1); }
+}
+
+.prog-line {
+  flex: 1;
+  height: 2px;
+  margin: 0 2px;
+
+  &--done     { background: #10b981; }
+  &--active   { background: linear-gradient(90deg, #10b981, var(--accent)); }
+  &--upcoming { background: rgba(255, 255, 255, 0.06); }
+}
+
+// ── Track button ──────────────────────────────────────────────────────
+.track-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 13px;
+  border-radius: 14px;
+  background: var(--accent);
+  color: #fff;
+  font-size: clamp(12px, 3.3vw, 13px);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 16px rgba(63, 188, 185, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: transform 0.15s;
+
+  &:active { transform: scale(0.98); }
+
+  svg { width: 15px; height: 15px; }
+}

@@ -1,0 +1,82 @@
+<div class="booking-card" role="article" [attr.aria-label]="'Active booking ' + booking.requestNumber">
+
+  <!-- Status + request number -->
+  <div class="card-top">
+    <div class="status-row">
+      <div class="status-pulse" aria-hidden="true"></div>
+      <span class="status-label">{{ booking.statusLabel }}</span>
+    </div>
+    <div class="request-id">{{ booking.requestNumber }}</div>
+  </div>
+
+  <!-- Test names -->
+  <div class="test-names">
+    {{ displayTests }}
+    @if (extraTests > 0) {
+      <span class="extra">+{{ extraTests }} more</span>
+    }
+  </div>
+
+  <!-- Meta chips -->
+  <div class="meta-row">
+    <div class="meta-chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      ~{{ booking.etaMinutes }} min
+    </div>
+    <div class="meta-chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" aria-hidden="true">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+      {{ booking.location }}
+    </div>
+    <div class="meta-chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" aria-hidden="true">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      {{ booking.driverName }}
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-bar" role="progressbar"
+       [attr.aria-valuenow]="booking.progressStep + 1"
+       aria-valuemin="1" aria-valuemax="5"
+       [attr.aria-label]="'Step ' + (booking.progressStep + 1) + ' of 5'">
+    @for (item of progressItems; track $index) {
+      @if (item.kind === 'dot') {
+        <div class="prog-dot"
+             [class.prog-dot--done]="item.state === 'done'"
+             [class.prog-dot--active]="item.state === 'active'"
+             [class.prog-dot--upcoming]="item.state === 'upcoming'"
+             aria-hidden="true">
+        </div>
+      } @else {
+        <div class="prog-line"
+             [class.prog-line--done]="item.state === 'done'"
+             [class.prog-line--active]="item.state === 'active'"
+             [class.prog-line--upcoming]="item.state === 'upcoming'"
+             aria-hidden="true">
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Track button -->
+  <button class="track-btn" (click)="trackClick.emit()" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" aria-hidden="true">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+    Track Live
+  </button>
+
+</div>
