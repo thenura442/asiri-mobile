@@ -7,7 +7,7 @@ export const authGuard: CanActivateFn = async () => {
   const storage = inject(StorageService);
   const nav     = inject(NavController);
 
-  const token = await storage.get('access_token');
+  const token = await storage.get<string>('accessToken');
   if (!token) {
     nav.navigateRoot('/');
     return false;

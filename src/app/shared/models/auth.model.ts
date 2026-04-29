@@ -57,9 +57,8 @@ export interface OtpVerifyRequest {
 }
 
 export interface OtpVerifyResponse {
-  verified: boolean;
-  accessToken: string;
-  refreshToken: string;
+  verified:  boolean;
+  patientId: string;
 }
 
 export interface ForgotPasswordRequest {

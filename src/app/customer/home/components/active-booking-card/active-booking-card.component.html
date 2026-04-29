@@ -4,7 +4,8 @@
   <div class="card-top">
     <div class="status-row">
       <div class="status-pulse" aria-hidden="true"></div>
-      <span class="status-label">{{ booking.statusLabel }}</span>
+      <!-- Replace status-label line -->
+      <span class="status-label">{{ booking.status | titlecase }}</span>
     </div>
     <div class="request-id">{{ booking.requestNumber }}</div>
   </div>
@@ -46,10 +47,11 @@
   </div>
 
   <!-- Progress bar -->
+  <!-- Replace progress-bar aria attributes -->
   <div class="progress-bar" role="progressbar"
-       [attr.aria-valuenow]="booking.progressStep + 1"
-       aria-valuemin="1" aria-valuemax="5"
-       [attr.aria-label]="'Step ' + (booking.progressStep + 1) + ' of 5'">
+      [attr.aria-valuenow]="progressStep + 1"
+      aria-valuemin="1" aria-valuemax="5"
+      [attr.aria-label]="'Step ' + (progressStep + 1) + ' of 5'">
     @for (item of progressItems; track $index) {
       @if (item.kind === 'dot') {
         <div class="prog-dot"

@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { NgStyle } from '@angular/common';
 import { IonContent } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular/standalone';
 import { AuthService } from '../../../../shared/services/auth.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 
@@ -13,15 +13,16 @@ interface Particle {
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [IonContent, ReactiveFormsModule, RouterLink, NgStyle],
+  host: { class: 'ion-page' },
+  imports: [IonContent, ReactiveFormsModule, NgStyle],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
-  private fb      = inject(FormBuilder);
-  private auth    = inject(AuthService);
-  private toast   = inject(ToastService);
-  private router  = inject(Router);
+  private fb    = inject(FormBuilder);
+  private auth  = inject(AuthService);
+  private toast = inject(ToastService);
+  private nav   = inject(NavController);
 
   form = this.fb.group({
     phone:      ['', [Validators.required, Validators.pattern(/^7[0-9]{8}$/)]],
@@ -42,7 +43,12 @@ export class LoginComponent {
   ];
 
   particleStyle(p: Particle): { [key: string]: string } {
-    return { left: `${p.left}%`, bottom: `${p.bottom}%`, '--d': `${p.d}s`, '--dl': `${p.dl}s` };
+    return {
+      left:   `${p.left}%`,
+      bottom: `${p.bottom}%`,
+      '--d':  `${p.d}s`,
+      '--dl': `${p.dl}s`,
+    };
   }
 
   get phoneInvalid(): boolean {
@@ -73,22 +79,25 @@ export class LoginComponent {
     this.isLoading = true;
     try {
       const { phone, password, rememberMe } = this.form.value;
-      const res = await this.auth.loginCustomer({
+      await this.auth.loginCustomer({
         phone:      `+94${phone}`,
         password:   password!,
         rememberMe: rememberMe!,
       });
-      if (res.requires2fa) {
-        this.router.navigate(['/customer/auth/otp']);
-      } else {
-        this.router.navigate(['/customer/tabs/home'], { replaceUrl: true });
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Login failed. Please try again.';
-      await this.toast.showError(msg);
+      this.nav.navigateRoot('/customer/tabs/home');
+    } catch {
+      // error interceptor handles toast
     } finally {
       this.isLoading = false;
     }
+  }
+
+  goToRegister(): void {
+    this.nav.navigateRoot('/customer/auth/register');
+  }
+
+  goToForgotPassword(): void {
+    this.nav.navigateRoot('/customer/auth/forgot-password');
   }
 
   async loginWithGoogle(): Promise<void> {

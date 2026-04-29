@@ -29,7 +29,7 @@
       </p>
 
       <!-- OTP boxes -->
-      <div class="otp-row" role="group" aria-label="6-digit verification code">
+      <!-- <div class="otp-row" role="group" aria-label="6-digit verification code">
         @for (val of otpValues; track $index) {
           <input
             #otpInput
@@ -44,7 +44,7 @@
             [attr.aria-label]="'Digit ' + ($index + 1)"
           />
         }
-      </div>
+      </div> -->
 
       <!-- Timer + resend -->
       <div class="timer-row">
@@ -63,7 +63,7 @@
       </div>
 
       <!-- Verify button -->
-      <button class="btn-verify" (click)="onVerify()"
+      <!-- <button class="btn-verify" (click)="onVerify()"
               [disabled]="isLoading" [attr.aria-busy]="isLoading">
         @if (!isLoading) {
           <span>
@@ -77,7 +77,7 @@
         } @else {
           <span class="spinner" aria-label="Verifying"></span>
         }
-      </button>
+      </button> -->
     </div>
 
     <div class="page-footer">

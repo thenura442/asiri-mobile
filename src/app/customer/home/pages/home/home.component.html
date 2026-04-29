@@ -18,7 +18,6 @@
         <app-pending-charges-banner [amount]="data.pendingCharges" />
       }
     } @else if (isLoading()) {
-      <!-- Skeleton state -->
       <div class="hero-skeleton" aria-busy="true" aria-label="Loading home data">
         <div class="skel skel--greeting"></div>
         <div class="skel skel--stats"></div>
@@ -61,14 +60,12 @@
   <div class="sheet" [class.sheet--open]="sheetOpen()"
        role="region" aria-label="Bookings and actions">
 
-    <!-- Drag handle (tap to toggle) -->
     <button class="sheet-handle" (click)="toggleSheet()"
             [attr.aria-expanded]="sheetOpen()"
             aria-label="Toggle sheet">
       <div class="handle-pill" aria-hidden="true"></div>
     </button>
 
-    <!-- Sheet scrollable content -->
     <div class="sheet-inner">
 
       <!-- Active booking card -->
@@ -78,17 +75,41 @@
           (trackClick)="onTrackBooking(booking.id)" />
       }
 
-      <!-- Book a Test CTA -->
+      <!-- Book a Test CTA — always visible -->
       <app-quick-actions (bookNow)="onBookTest()" />
 
-      <!-- Recent bookings -->
+      <!-- Recent bookings OR empty state -->
       @if (homeData()?.recentBookings?.length) {
         <app-recent-bookings-list
           [bookings]="homeData()!.recentBookings"
           (viewAll)="onViewAllBookings()" />
+      } @else if (homeData() && !isLoading()) {
+        <!-- Empty state for new users -->
+        <div class="empty-state">
+          <div class="empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round">
+              <circle cx="32" cy="32" r="28" stroke="rgba(0,43,76,0.08)"/>
+              <path d="M20 32h24M32 20v24" stroke="var(--accent)" stroke-width="2"/>
+              <circle cx="32" cy="32" r="10" stroke="rgba(63,188,185,0.2)"/>
+            </svg>
+          </div>
+          <h3 class="empty-title">No bookings yet</h3>
+          <p class="empty-desc">
+            Book your first lab test and we'll come to you.
+            Results delivered digitally.
+          </p>
+          <button class="empty-cta" type="button" (click)="onBookTest()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Book Your First Test
+          </button>
+        </div>
       }
 
-      <!-- Bottom spacer for tab bar clearance -->
       <div class="sheet-bottom-spacer" aria-hidden="true"></div>
     </div>
   </div>

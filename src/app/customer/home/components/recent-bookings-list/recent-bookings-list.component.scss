@@ -116,7 +116,15 @@
 }
 
 // ── Right column ──────────────────────────────────────────────────────
-.card-right { text-align: right; flex-shrink: 0; }
+// ── Right column ──────────────────────────────────────────────────────
+.card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
 
 .card-price {
   font-family: 'JetBrains Mono', monospace;
@@ -124,6 +132,7 @@
   font-weight: 700;
   color: #0f1c2e;
   letter-spacing: -0.3px;
+  line-height: 1;
 }
 
 // ── Status badge ──────────────────────────────────────────────────────
@@ -135,9 +144,9 @@
   border-radius: 6px;
   font-size: 9px;
   font-weight: 700;
-  margin-top: 3px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  margin-top: 0; // ← remove the margin-top, gap handles spacing now
 
   i {
     width: 4px; height: 4px;

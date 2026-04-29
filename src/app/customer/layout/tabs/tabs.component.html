@@ -1,18 +1,15 @@
 <div class="tabs-shell">
 
-  <!-- Routed page content -->
   <ion-router-outlet></ion-router-outlet>
 
-  <!-- Floating glassmorphic tab bar -->
   <nav class="nav-bar" role="navigation" aria-label="Main navigation">
     <div class="nav-dock">
 
       <!-- Home -->
-      <a class="tab-item"
-         routerLink="/customer/tabs/home"
-         routerLinkActive="tab-item--active"
-         [routerLinkActiveOptions]="{exact: false}"
-         aria-label="Home">
+      <button class="tab-item"
+              (click)="goTo('home')"
+              [class.tab-item--active]="activeTab() === 'home'"
+              aria-label="Home">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
              aria-hidden="true">
@@ -20,13 +17,13 @@
           <polyline points="9 22 9 12 15 12 15 22"/>
         </svg>
         <span>Home</span>
-      </a>
+      </button>
 
       <!-- Bookings -->
-      <a class="tab-item"
-         routerLink="/customer/tabs/bookings"
-         routerLinkActive="tab-item--active"
-         aria-label="My Bookings">
+      <button class="tab-item"
+              (click)="goTo('bookings')"
+              [class.tab-item--active]="activeTab() === 'bookings'"
+              aria-label="My Bookings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
              aria-hidden="true">
@@ -34,14 +31,11 @@
           <rect x="8" y="2" width="8" height="4" rx="1"/>
         </svg>
         <span>Bookings</span>
-      </a>
+      </button>
 
       <!-- Centre: Book a Test CTA -->
       <div class="tab-center">
-        <button
-          class="tab-center-btn"
-          (click)="bookTest()"
-          aria-label="Book a Test">
+        <button class="tab-center-btn" (click)="bookTest()" aria-label="Book a Test">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
             <path d="M12 5v14M5 12h14"/>
@@ -50,10 +44,10 @@
       </div>
 
       <!-- Reports -->
-      <a class="tab-item"
-         routerLink="/customer/tabs/reports"
-         routerLinkActive="tab-item--active"
-         aria-label="Reports">
+      <button class="tab-item"
+              (click)="goTo('reports')"
+              [class.tab-item--active]="activeTab() === 'reports'"
+              aria-label="Reports">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
              aria-hidden="true">
@@ -63,16 +57,17 @@
           <line x1="16" y1="17" x2="8" y2="17"/>
         </svg>
         <span>Reports</span>
-      </a>
+      </button>
 
       <!-- Profile -->
-      <a class="tab-item"
-         routerLink="/customer/tabs/profile"
-         routerLinkActive="tab-item--active"
-         aria-label="Profile">
-        <!-- Notification badge -->
+      <button class="tab-item"
+              (click)="goTo('profile')"
+              [class.tab-item--active]="activeTab() === 'profile'"
+              aria-label="Profile">
         @if (hasNotifications) {
-          <div class="notification-dot" aria-label="{{ notificationCount() }} unread notifications"></div>
+          <div class="notification-dot"
+               [attr.aria-label]="notificationCount() + ' unread notifications'">
+          </div>
         }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -81,7 +76,7 @@
           <circle cx="12" cy="7" r="4"/>
         </svg>
         <span>Profile</span>
-      </a>
+      </button>
 
     </div>
   </nav>

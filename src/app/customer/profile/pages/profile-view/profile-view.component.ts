@@ -24,24 +24,35 @@ export class ProfileViewComponent implements OnInit {
   notificationsEnabled = signal(true);
 
   async ngOnInit(): Promise<void> {
-    const data = await this.profileService.getProfile();
-    this.profile.set(data);
-    this.isLoading.set(false);
+    try {
+      const data = await this.profileService.getProfile();
+      this.profile.set(data);
+    } catch {
+      // interceptor handles error toast
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   get initials(): string {
     const p = this.profile();
     if (!p) return '?';
-    return `${p.firstName[0]}${p.lastName[0]}`.toUpperCase();
+    if (p.firstName && p.lastName) {
+      return `${p.firstName[0]}${p.lastName[0]}`.toUpperCase();
+    }
+    const parts = p.fullName.trim().split(' ');
+    return parts.length >= 2
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+      : parts[0][0].toUpperCase();
   }
 
   formatAmount(n: number): string {
     return `Rs. ${n.toLocaleString('en-LK')}`;
   }
 
-  goEdit():        void { this.router.navigate(['/customer/profile/edit']); }
-  goReportIssue(): void { this.router.navigate(['/customer/profile/report-issue']); }
-  goNotifications():void { this.router.navigate(['/customer/tabs/notifications']); }
+  goEdit():          void { this.router.navigate(['/customer/profile/edit']); }
+  goReportIssue():   void { this.router.navigate(['/customer/profile/report-issue']); }
+  goNotifications(): void { this.router.navigate(['/customer/tabs/notifications']); }
 
   toggleNotifications(): void {
     this.notificationsEnabled.update(v => !v);

@@ -1,25 +1,28 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavController } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { IonContent } from '@ionic/angular/standalone';
 import { ReportsService } from '../../services/reports.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import { ReportListItem, ReportFilter } from '../../models/reports.model';
 
 @Component({
   selector: 'app-report-list',
   standalone: true,
+  host: { class: 'ion-page' },
   imports: [IonContent, FormsModule],
   templateUrl: './report-list.component.html',
   styleUrls: ['./report-list.component.scss'],
 })
 export class ReportListComponent implements OnInit {
   private service = inject(ReportsService);
-  private router  = inject(Router);
+  private nav         = inject(NavController);
+  private toast   = inject(ToastService);
 
-  all         = signal<ReportListItem[]>([]);
-  searchQuery = signal('');
+  all          = signal<ReportListItem[]>([]);
+  searchQuery  = signal('');
   activeFilter = signal<ReportFilter>('All');
-  isLoading   = signal(true);
+  isLoading    = signal(true);
 
   readonly filters: ReportFilter[] = ['All', 'Ready', 'Processing'];
 
@@ -29,7 +32,8 @@ export class ReportListComponent implements OnInit {
     const q = this.searchQuery().toLowerCase();
     const f = this.activeFilter();
     return this.all().filter(r => {
-      const matchSearch = !q || r.testNames.some(t => t.toLowerCase().includes(q))
+      const matchSearch = !q
+        || r.testNames.some(t => t.toLowerCase().includes(q))
         || r.requestNumber.toLowerCase().includes(q);
       const matchFilter = f === 'All' || r.status.toLowerCase() === f.toLowerCase();
       return matchSearch && matchFilter;
@@ -50,16 +54,22 @@ export class ReportListComponent implements OnInit {
   }
 
   openDetail(id: string): void {
-    this.router.navigate(['/customer/reports/detail', id]);
+    this.nav.navigateRoot(['/customer/tabs/reports/detail', id]);
   }
 
-  onDownload(id: string, event: Event): void {
+  async onDownload(id: string, event: Event): Promise<void> {
     event.stopPropagation();
-    // In production: call service.downloadReport(id) then open URL
+    try {
+      const url = await this.service.downloadReport(id);
+      window.open(url, '_blank');
+    } catch {
+      await this.toast.showError('Report not available for download yet.');
+    }
   }
 
-  onShare(id: string, event: Event): void {
+  async onShare(id: string, event: Event): Promise<void> {
     event.stopPropagation();
+    await this.toast.showWarning('Share feature coming soon.');
   }
 
   formatTests(r: ReportListItem): string {

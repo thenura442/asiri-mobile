@@ -197,7 +197,7 @@
             <span>Start Navigation</span>
           </button>
 
-          @if (status() !== 'delivered') {
+          @if (status() !== 'at_center') {
             <button class="btn-status" type="button" (click)="onCtaAction()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                    stroke-width="2" aria-hidden="true">
@@ -237,17 +237,7 @@
     @if (!isLoading() && !job()) {
       <div class="empty-state">
 
-        <div class="sticky-top">
-          <div class="pg-header">
-            <h1>My Job</h1>
-            <button class="online-badge online-badge--on" type="button"
-                    (click)="toggleOnline()">
-              <i aria-hidden="true"></i>Online
-            </button>
-          </div>
-        </div>
-
-        <div class="empty-body">
+        <div class="empty-body" style="margin-top: 10%;">
           <div class="empty-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M5 17h14v-6l-2-4H7L5 11v6z"/>

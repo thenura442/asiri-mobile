@@ -1,9 +1,10 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
 import { BookingStateService } from '../../services/booking-state.service';
 import { BookingService } from '../../services/booking.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import { TimeSlot, BranchSummary, ScheduleMode } from '../../models/booking.model';
+import { NavController } from '@ionic/angular/standalone';
 
 interface DateChip {
   iso:   string;
@@ -15,14 +16,16 @@ interface DateChip {
 @Component({
   selector: 'app-schedule',
   standalone: true,
+  host: { class: 'ion-page' },
   imports: [IonContent],
   templateUrl: './schedule.component.html',
   styleUrls: ['./schedule.component.scss'],
 })
 export class ScheduleComponent implements OnInit {
-  private bookingState = inject(BookingStateService);
+  private bookingState   = inject(BookingStateService);
   private bookingService = inject(BookingService);
-  private router = inject(Router);
+  private nav            = inject(NavController);
+  private toast          = inject(ToastService);
 
   scheduleMode = signal<ScheduleMode>('now');
   selectedDate = signal<string>('');
@@ -30,21 +33,26 @@ export class ScheduleComponent implements OnInit {
   slots        = signal<TimeSlot[]>([]);
   isLoading    = signal(false);
 
-  readonly branch: BranchSummary = {
-    id: 'b1', name: 'Asiri Central Lab',
-    distKm: 2.3, etaMin: 18, totalMin: 35, traffic: 'Low',
-  };
+  // Branch is now resolved from backend, not hardcoded
+  branch = signal<BranchSummary>({
+    id:       '',
+    name:     'Finding nearest branch...',
+    distKm:   0,
+    etaMin:   0,
+    totalMin: 0,
+    traffic:  'Low',
+  });
 
   readonly dateChips: DateChip[] = this.buildDateChips();
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.selectedDate.set(this.dateChips[0].iso);
-    this.loadSlots();
+    await this.loadSlots();
   }
 
   private buildDateChips(): DateChip[] {
     const chips: DateChip[] = [];
-    const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const dows   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     for (let i = 0; i < 7; i++) {
       const d = new Date();
@@ -75,9 +83,17 @@ export class ScheduleComponent implements OnInit {
 
   private async loadSlots(): Promise<void> {
     this.isLoading.set(true);
-    const s = await this.bookingService.getAvailableSlots(this.branch.id, this.selectedDate());
-    this.slots.set(s);
-    this.isLoading.set(false);
+    try {
+      const resolved = await this.bookingService.getAvailableSlotsForLocation(
+        this.selectedDate()
+      );
+      this.branch.set(resolved.branch);
+      this.slots.set(resolved.slots);
+    } catch {
+      this.slots.set([]);
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   canContinue = computed(() => {
@@ -85,15 +101,21 @@ export class ScheduleComponent implements OnInit {
     return !!this.selectedSlot();
   });
 
-  onContinue(): void {
+  async onContinue(): Promise<void> {
+    if (this.scheduleMode() === 'scheduled' && !this.selectedSlot()) {
+      await this.toast.showError('Please select a time slot.');
+      return;
+    }
     this.bookingState.setSchedule({
       mode:     this.scheduleMode(),
       date:     this.scheduleMode() === 'scheduled' ? this.selectedDate() : undefined,
       timeSlot: this.scheduleMode() === 'scheduled' ? this.selectedSlot() : undefined,
-      branch:   this.branch,
+      branch:   this.branch(),
     });
-    this.router.navigate(['/customer/booking/confirm']);
+    this.nav.navigateRoot('/customer/booking/confirm');
   }
 
-  goBack(): void { this.router.navigate(['/customer/booking/location']); }
+  goBack(): void {
+    this.nav.navigateRoot('/customer/booking/location');
+  }
 }

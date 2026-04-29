@@ -44,7 +44,7 @@
              [class.test-card--selected]="isSelected(test.id)"
              (click)="toggleTest(test.id)"
              [attr.aria-pressed]="isSelected(test.id)"
-             [attr.aria-label]="test.name + ' — ' + formatPrice(test.priceRs)">
+             [attr.aria-label]="test.name + ' — ' + formatPrice(test.price)">
 
           <!-- Checkbox -->
           <div class="tc-check" aria-hidden="true">
@@ -58,11 +58,12 @@
             <div class="tc-name">{{ test.name }}</div>
             <div class="tc-code">{{ test.code }}</div>
             <div class="tc-meta">
-              <span class="tc-badge" [class.tc-badge--blood]="test.sampleType === 'blood'"
+              <span class="tc-badge"
+                    [class.tc-badge--blood]="test.sampleType === 'blood'"
                     [class.tc-badge--urine]="test.sampleType === 'urine'">
                 {{ test.sampleType | titlecase }}
               </span>
-              @if (test.requiresPrescription) {
+              @if (test.prescriptionReq) {
                 <span class="tc-badge tc-badge--rx">Rx Required</span>
               }
               <span class="tc-badge tc-badge--time">
@@ -71,7 +72,7 @@
                   <circle cx="12" cy="12" r="10"/>
                   <polyline points="12 6 12 12 16 14"/>
                 </svg>
-                {{ test.turnaround }}
+                {{ test.turnaroundTime }}
               </span>
             </div>
           </div>
@@ -79,7 +80,7 @@
           <!-- Price -->
           <div class="tc-price-wrap">
             <div class="tc-price-label">Price</div>
-            <div class="tc-price">{{ formatPrice(test.priceRs) }}</div>
+            <div class="tc-price">{{ formatPrice(test.price) }}</div>
           </div>
         </div>
       }
@@ -98,7 +99,6 @@
         </div>
       }
 
-      <!-- Bottom spacer for bar clearance -->
       <div style="height: 100px" aria-hidden="true"></div>
     </div>
 
@@ -110,13 +110,16 @@
          [attr.aria-label]="selectedCount() + ' tests selected'">
       <div class="bb-inner">
         <div class="bb-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke="#fff">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"
+               stroke-linecap="round" stroke="#fff">
             <path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
           </svg>
         </div>
         <div class="bb-info">
-          <div class="bb-count">{{ selectedCount() }} test{{ selectedCount() !== 1 ? 's' : '' }} selected</div>
-          <div class="bb-total">Rs. {{ totalPrice().toLocaleString('en-LK') }}</div>
+          <div class="bb-count">
+            {{ selectedCount() }} test{{ selectedCount() !== 1 ? 's' : '' }} selected
+          </div>
+          <div class="bb-total">Rs. {{ priceBreakdown().testTotal.toLocaleString('en-US') }}</div>
         </div>
         <button class="bb-btn" type="button" (click)="onContinue()">
           <span>Continue

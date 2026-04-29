@@ -21,17 +21,26 @@ export class NotificationListComponent implements OnInit {
   unreadCount = () => this.service.unreadCount(this.groups());
 
   async ngOnInit(): Promise<void> {
-    const data = await this.service.getNotifications();
-    this.groups.set(data);
-    this.isLoading.set(false);
+    try {
+      const data = await this.service.getNotifications();
+      this.groups.set(data);
+    } catch {
+      // interceptor handles error toast
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   async markAllRead(): Promise<void> {
-    await this.service.markAllRead();
-    this.groups.update(gs => gs.map(g => ({
-      ...g,
-      items: g.items.map(n => ({ ...n, unread: false })),
-    })));
+    try {
+      await this.service.markAllRead();
+      this.groups.update(gs => gs.map(g => ({
+        ...g,
+        items: g.items.map(n => ({ ...n, unread: false })),
+      })));
+    } catch {
+      // interceptor handles error toast
+    }
   }
 
   onTap(n: NotificationItem): void {
@@ -47,9 +56,6 @@ export class NotificationListComponent implements OnInit {
   }
 
   cardClass(n: NotificationItem): string {
-    return [
-      n.unread ? 'card--unread' : '',
-      `card--${n.type}`,
-    ].filter(Boolean).join(' ');
+    return [n.unread ? 'card--unread' : '', `card--${n.type}`].filter(Boolean).join(' ');
   }
 }

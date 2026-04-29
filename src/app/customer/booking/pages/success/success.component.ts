@@ -1,8 +1,8 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
 import { BookingStateService } from '../../services/booking-state.service';
-
+import { NavController } from '@ionic/angular/standalone';
+  
 interface ConfettiPiece {
   color:  string;
   left:   number;
@@ -15,13 +15,14 @@ interface ConfettiPiece {
 @Component({
   selector: 'app-success',
   standalone: true,
+  host: { class: 'ion-page' },
   imports: [IonContent],
   templateUrl: './success.component.html',
   styleUrls: ['./success.component.scss'],
 })
 export class SuccessComponent implements OnInit {
   private booking = inject(BookingStateService);
-  private router  = inject(Router);
+  private nav     = inject(NavController);
 
   requestNumber = signal('');
   etaMinutes    = signal(0);
@@ -43,15 +44,13 @@ export class SuccessComponent implements OnInit {
     const state = history.state;
     this.requestNumber.set(state?.requestNumber ?? 'REQ-2026-' + Math.floor(Math.random() * 9000 + 1000));
     this.etaMinutes.set(state?.etaMinutes ?? 18);
-    // Clear booking state after success
-    this.booking.reset();
   }
 
   onTrack(): void {
-    this.router.navigate(['/customer/tabs/bookings'], { replaceUrl: true });
+    this.nav.navigateRoot('/customer/tabs/bookings');
   }
 
   onHome(): void {
-    this.router.navigate(['/customer/tabs/home'], { replaceUrl: true });
+    this.nav.navigateRoot('/customer/tabs/home');
   }
 }

@@ -21,10 +21,24 @@ export class RecentBookingsListComponent {
   }
 
   displayTests(booking: RecentBookingSummary): string {
-    return booking.testNames.slice(0, 2).join(', ');
+    return booking.tests.slice(0, 2).join(', ');
   }
 
-  statusLabel(status: RecentBookingSummary['status']): string {
-    return { completed: 'Done', processing: 'Processing', cancelled: 'Cancelled', active: 'Active' }[status];
+  extraTests(booking: RecentBookingSummary): number {
+    return Math.max(0, booking.tests.length - 2);
+  }
+
+  statusLabel(status: string): string {
+    const map: Record<string, string> = {
+      completed: 'Done',
+      processing: 'Processing',
+      cancelled: 'Cancelled',
+      active: 'Active',
+      en_route: 'En Route',
+      arrived: 'Arrived',
+      collecting: 'Collecting',
+      collected: 'Collected',
+    };
+    return map[status] ?? status;
   }
 }

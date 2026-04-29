@@ -2,26 +2,30 @@ export type BookingStatus =
   | 'en_route'
   | 'pending'
   | 'assigned'
+  | 'allocated'    // ← add
+  | 'accepted'     // ← add
+  | 'dispatched'   // ← add
   | 'arrived'
   | 'collecting'
   | 'collected'
   | 'processing'
   | 'completed'
   | 'cancelled';
-
+  
 export type FilterTab = 'All' | 'Active' | 'Completed' | 'Cancelled';
 
 export interface BookingListItem {
   id:            string;
   requestNumber: string;
   status:        BookingStatus;
-  testNames:     string[];
-  dateDisplay:   string;   // "Today, 08:00 AM" or "Apr 8, 09:00 AM"
-  dateIso:       string;
+  tests:         string[];
+  testCount:     number;
+  date:          string;
+  scheduledAt:   string | null;
   location:      string;
-  amountLkr:     number;
-  etaMinutes?:   number;   // present only when en_route
-  driverName?:   string;
+  totalPrice:    number;
+  etaMinutes:    number | null;
+  driverName:    string | null;
 }
 
 export interface DetailTest {

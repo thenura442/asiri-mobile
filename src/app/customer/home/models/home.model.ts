@@ -1,25 +1,22 @@
-// ── Progress stage for active booking tracking bar ────────────────────
-export type BookingProgressStep = 0 | 1 | 2 | 3 | 4;
-// 0=assigned, 1=en_route, 2=arrived, 3=collecting, 4=completed
-
 export interface ActiveBookingCard {
   id:            string;
   requestNumber: string;
-  statusLabel:   string;    // e.g. "En Route"
-  tests:         string[];  // test names
-  etaMinutes:    number;    // estimated arrival time
-  location:      string;    // patient suburb/city
-  driverName:    string;
-  progressStep:  BookingProgressStep;
+  status:        string;
+  tests:         string[];
+  testCount:     number;
+  etaMinutes:    number | null;
+  location:      string;
+  driverName:    string | null;
 }
 
 export interface RecentBookingSummary {
   id:            string;
   requestNumber: string;
-  testNames:     string[];
-  date:          string;    // ISO date string
-  amountLkr:     number;
-  status:        'completed' | 'processing' | 'cancelled' | 'active';
+  tests:         string[];
+  testCount:     number;
+  date:          string;
+  status:        string;
+  totalPrice:    number;
 }
 
 export interface HomeStats {
@@ -30,12 +27,13 @@ export interface HomeStats {
 
 export interface CustomerHomeData {
   profile: {
-    fullName:   string;
-    firstName:  string;
-    avatarUrl:  string | null;
+    fullName:  string;
+    firstName: string;
+    avatarUrl: string | null;
   };
-  stats:          HomeStats;
-  pendingCharges: number | null;    // null = no pending charges
-  activeBooking:  ActiveBookingCard | null;
-  recentBookings: RecentBookingSummary[];
+  stats:               HomeStats;
+  pendingCharges:      number | null;
+  pendingChargeReason: string | null;
+  activeBooking:       ActiveBookingCard | null;
+  recentBookings:      RecentBookingSummary[];
 }

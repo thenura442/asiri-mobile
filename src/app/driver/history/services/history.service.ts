@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
-import { HistoryJob, HistoryStats } from '../models/history.model';
+import { HistoryJob, HistoryStats, HistoryOutcome } from '../models/history.model';
 
 @Injectable({ providedIn: 'root' })
 export class HistoryService {
@@ -8,16 +8,37 @@ export class HistoryService {
 
   async getHistory(): Promise<HistoryJob[]> {
     try {
-      const res = await this.api.get<HistoryJob[]>('/driver/history');
-      return res.data;
-    } catch { return this.mockHistory(); }
+      const res = await this.api.get<any>('/driver/jobs/history');
+      return (res.data.jobs ?? []).map((j: any) => ({
+        id:            j.id,
+        requestNumber: j.requestNumber,
+        patientName:   j.patientName,
+        testCount:     j.testCount,
+        dateDisplay:   this.formatDate(j.date),
+        dateIso:       j.date,
+        outcome:       j.status as HistoryOutcome,
+      }));
+    } catch {
+      return this.mockHistory();
+    }
   }
 
   async getStats(): Promise<HistoryStats> {
     try {
-      const res = await this.api.get<HistoryStats>('/driver/history/stats');
-      return res.data;
-    } catch { return { today: 3, thisWeek: 18, thisMonth: 72 }; }
+      const res = await this.api.get<any>('/driver/jobs/history');
+      return res.data.stats ?? { today: 0, thisWeek: 0, thisMonth: 0 };
+    } catch {
+      return { today: 3, thisWeek: 18, thisMonth: 72 };
+    }
+  }
+
+  private formatDate(iso: string): string {
+    const d         = new Date(iso);
+    const today     = new Date();
+    const yesterday = new Date(Date.now() - 86400000);
+    if (d.toDateString() === today.toDateString())     return 'Today';
+    if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+    return d.toLocaleDateString('en-LK', { month: 'short', day: 'numeric' });
   }
 
   private mockHistory(): HistoryJob[] {

@@ -1,17 +1,19 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { IonContent } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular/standalone';
 import { TestCatalogService } from '../../services/test-catalog.service';
 import { BookingStateService } from '../../services/booking-state.service';
 import { SelectedTest } from '../../models/booking.model';
 import { TitleCasePipe } from '@angular/common';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 type CategoryFilter = 'All' | 'Blood' | 'Urine';
 
 @Component({
   selector: 'app-select-tests',
   standalone: true,
+  host: { class: 'ion-page' },
   imports: [IonContent, FormsModule, TitleCasePipe],
   templateUrl: './select-tests.component.html',
   styleUrls: ['./select-tests.component.scss'],
@@ -19,7 +21,8 @@ type CategoryFilter = 'All' | 'Blood' | 'Urine';
 export class SelectTestsComponent implements OnInit {
   private catalog = inject(TestCatalogService);
   private booking = inject(BookingStateService);
-  private router  = inject(Router);
+  private nav     = inject(NavController);
+  private toast   = inject(ToastService);
 
   allTests     = signal<SelectedTest[]>([]);
   searchQuery  = signal('');
@@ -37,19 +40,17 @@ export class SelectTestsComponent implements OnInit {
     });
   });
 
-  hasRxTests = computed(() => this.allTests().some(t => t.requiresPrescription && t.selected));
-
+  hasRxTests    = computed(() => this.allTests().some(t => t.prescriptionReq && t.selected));
   selectedCount = this.booking.selectedCount;
   totalPrice    = this.booking.totalPrice;
-
+  priceBreakdown = this.booking.priceBreakdown;
   async ngOnInit(): Promise<void> {
-    const catalog = await this.catalog.getCatalog();
+    const catalog  = await this.catalog.getCatalog();
     const existing = this.booking.selectedTests().map(t => t.id);
     this.allTests.set(catalog.map(t => ({
       ...t,
       selected: existing.includes(t.id),
     })));
-    // Sync state
     this.booking.setTests(this.allTests());
   }
 
@@ -66,26 +67,32 @@ export class SelectTestsComponent implements OnInit {
       tests.map(t => t.id === id ? { ...t, selected: !t.selected } : t)
     );
     this.booking.setTests(this.allTests());
+    console.log('hasRxTests:', this.hasRxTests());
+    console.log('selected tests:', this.allTests().filter(t => t.selected));
   }
 
   isSelected(id: string): boolean {
     return this.allTests().find(t => t.id === id)?.selected ?? false;
   }
 
-  formatPrice(p: number): string {
-    return `Rs. ${p.toLocaleString('en-LK')}`;
+  formatPrice(p: number | string): string {
+    const num = Number(p);
+    return `Rs. ${num.toLocaleString('en-US')}`;
   }
 
-  onContinue(): void {
-    if (this.selectedCount() === 0) return;
+  async onContinue(): Promise<void> {
+    if (this.selectedCount() === 0) {
+      await this.toast.showError('Please select at least one test.');
+      return;
+    }
     if (this.hasRxTests()) {
-      this.router.navigate(['/customer/booking/prescription']);
+      this.nav.navigateRoot('/customer/booking/prescription');
     } else {
-      this.router.navigate(['/customer/booking/location']);
+      this.nav.navigateRoot('/customer/booking/location');
     }
   }
 
   goBack(): void {
-    this.router.navigate(['/customer/tabs/home']);
+    this.nav.navigateRoot('/customer/tabs/home');
   }
 }

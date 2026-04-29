@@ -77,7 +77,7 @@
         <div class="field-group">
           <div class="field-row">
             <label class="field-label" for="password">Password</label>
-            <a routerLink="/customer/auth/forgot-password" class="field-link">Forgot?</a>
+            <a (click)="goToForgotPassword()" class="field-link">Forgot?</a>
           </div>
           <div class="input-wrap">
             <!-- Lock icon -->
@@ -193,7 +193,7 @@
     <!-- Footer -->
     <div class="footer">
       <p class="register-link">
-        New to Asiri? <a routerLink="/customer/auth/register">Create Account</a>
+        New to Asiri? <a (click)="goToRegister()">Create Account</a>
       </p>
       <div class="sys-status" aria-label="System status">
         <div class="sys-dot" aria-hidden="true"></div>

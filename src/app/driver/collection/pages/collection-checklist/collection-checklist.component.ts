@@ -8,10 +8,10 @@ import { ToastService } from '../../../../shared/services/toast.service';
 import { TitleCasePipe } from '@angular/common';
 
 interface CollectionEntry {
-  test:      JobTest;
-  outcome:   CollectionOutcome;
+  test:       JobTest;
+  outcome:    CollectionOutcome;
   failReason: FailReason | '';
-  notes:     string;
+  notes:      string;
 }
 
 const FAIL_REASONS: FailReason[] = [
@@ -36,8 +36,8 @@ export class CollectionChecklistComponent implements OnInit {
   private router     = inject(Router);
 
   jobId       = '';
-  patientName = signal('Kavindi Perera');
-  requestNum  = signal('REQ-2026-0847');
+  patientName = signal('');
+  requestNum  = signal('');
   entries     = signal<CollectionEntry[]>([]);
   isLoading   = signal(false);
 
@@ -46,6 +46,7 @@ export class CollectionChecklistComponent implements OnInit {
   collectedCount = computed(() =>
     this.entries().filter(e => e.outcome === 'collected').length
   );
+
   failedCount = computed(() =>
     this.entries().filter(e => e.outcome === 'failed').length
   );
@@ -56,23 +57,29 @@ export class CollectionChecklistComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.jobId = this.route.snapshot.paramMap.get('id') ?? '';
-    const job = await this.jobService.getActiveJob();
-    if (job) {
-      this.patientName.set(job.patient.fullName);
-      this.requestNum.set(job.requestNumber);
-      this.entries.set(job.tests.map(t => ({
-        test: t,
-        outcome: 'pending' as CollectionOutcome,
-        failReason: '',
-        notes: '',
-      })));
+    try {
+      const job = await this.jobService.getActiveJob();
+      if (job) {
+        this.patientName.set(job.patient.fullName);
+        this.requestNum.set(job.requestNumber);
+        this.entries.set(job.tests.map(t => ({
+          test:       t,
+          outcome:    'pending' as CollectionOutcome,
+          failReason: '',
+          notes:      '',
+        })));
+      }
+    } catch {
+      // interceptor handles error toast
     }
   }
 
   setOutcome(index: number, outcome: CollectionOutcome): void {
     this.entries.update(entries =>
       entries.map((e, i) =>
-        i === index ? { ...e, outcome, failReason: outcome === 'collected' ? '' : e.failReason } : e
+        i === index
+          ? { ...e, outcome, failReason: outcome === 'collected' ? '' : e.failReason }
+          : e
       )
     );
   }
@@ -97,17 +104,17 @@ export class CollectionChecklistComponent implements OnInit {
     this.isLoading.set(true);
     try {
       const results: TestCollectionResult[] = this.entries().map(e => ({
-        testId:    e.test.id,
-        outcome:   e.outcome,
+        testId:     e.test.id,
+        outcome:    e.outcome,
         failReason: e.outcome === 'failed' && e.failReason ? e.failReason : undefined,
-        notes:     e.notes || undefined,
+        notes:      e.notes || undefined,
       }));
       await this.jobService.submitCollection(this.jobId, results);
       await this.jobService.advanceStatus(this.jobId, 'returning');
       await this.toast.showSuccess('Collection submitted successfully!');
       this.router.navigate(['/driver/tabs/my-job'], { replaceUrl: true });
     } catch {
-      await this.toast.showError('Failed to submit. Please try again.');
+      // interceptor handles error toast
     } finally {
       this.isLoading.set(false);
     }

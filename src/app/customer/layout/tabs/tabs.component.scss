@@ -68,6 +68,9 @@
   text-decoration: none;
   position: relative;
   transition: opacity 0.15s;
+  background: none;      // ← add
+  border: none;          // ← add
+  outline: none;         // ← add
 
   // Active dot indicator
   &--active::after {

@@ -1,5 +1,4 @@
 export type ReportStatus = 'ready' | 'processing';
-
 export type ReportFilter = 'All' | 'Ready' | 'Processing';
 
 export interface ReportListItem {
@@ -13,11 +12,11 @@ export interface ReportListItem {
 }
 
 export interface ReportResult {
-  testName:    string;
-  value:       string;
-  unit:        string;
-  range:       string;
-  flag:        'normal' | 'high' | 'low';
+  testName: string;
+  value:    string;
+  unit:     string;
+  range:    string;
+  flag:     'normal' | 'high' | 'low';
 }
 
 export interface ReportDetail {
@@ -32,6 +31,13 @@ export interface ReportDetail {
   reportedAt:    string;
   status:        ReportStatus;
   pdfUrl?:       string;
+  tests: {
+    id:              string;
+    name:            string;
+    code:            string;
+    reportUrl:       string | null;
+    isCriticalValue: boolean;
+  }[];
   sections: {
     title:   string;
     results: ReportResult[];

@@ -37,8 +37,18 @@ export class ReportIssueComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
-    const data = await this.bookSvc.getBookings();
-    this.bookings.set(data.slice(0, 4));
+    try {
+      const data = await this.bookSvc.getBookings();
+      this.bookings.set(data.slice(0, 4));
+    } catch {
+      // interceptor handles error toast
+    }
+  }
+
+  formatDate(iso: string): string {
+    return new Date(iso).toLocaleDateString('en-LK', {
+      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
   }
 
   onDescriptionInput(event: Event): void {
@@ -60,9 +70,10 @@ export class ReportIssueComponent implements OnInit {
         description: this.form.value.description!,
         photoUrls:   [],
       });
+      await this.toast.showSuccess('Issue reported successfully.');
       this.submitted.set(true);
     } catch {
-      await this.toast.showError('Failed to submit. Please try again.');
+      // interceptor handles error toast
     } finally {
       this.isLoading.set(false);
     }
@@ -77,9 +88,9 @@ export class ReportIssueComponent implements OnInit {
   }
 
   formatTests(b: BookingListItem): string {
-    return b.testNames.slice(0, 2).join(', ');
+    return b.tests.slice(0, 2).join(', ');
   }
 
-  goBack():  void { this.router.navigate(['/customer/tabs/profile']); }
-  goHome():  void { this.router.navigate(['/customer/tabs/home'], { replaceUrl: true }); }
+  goBack(): void { this.router.navigate(['/customer/tabs/profile']); }
+  goHome(): void { this.router.navigate(['/customer/tabs/home'], { replaceUrl: true }); }
 }

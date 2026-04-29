@@ -13,29 +13,35 @@ import { HistoryJob, HistoryFilter, HistoryStats } from '../../models/history.mo
 export class JobHistoryComponent implements OnInit {
   private service = inject(HistoryService);
 
-  all        = signal<HistoryJob[]>([]);
-  stats      = signal<HistoryStats>({ today: 0, thisWeek: 0, thisMonth: 0 });
+  all          = signal<HistoryJob[]>([]);
+  stats        = signal<HistoryStats>({ today: 0, thisWeek: 0, thisMonth: 0 });
   activeFilter = signal<HistoryFilter>('All');
-  isLoading  = signal(true);
+  isLoading    = signal(true);
 
   readonly filters: HistoryFilter[] = ['All', 'Today', 'This Week', 'This Month'];
 
   filtered = computed(() => {
     const f = this.activeFilter();
-    if (f === 'All') return this.all();
-    if (f === 'Today') return this.all().filter(j => j.dateDisplay === 'Today');
-    if (f === 'This Week') return this.all().filter(j => ['Today','Yesterday'].includes(j.dateDisplay) || j.dateDisplay.startsWith('Apr'));
+    if (f === 'All')        return this.all();
+    if (f === 'Today')      return this.all().filter(j => j.dateDisplay === 'Today');
+    if (f === 'This Week')  return this.all().filter(j =>
+      ['Today', 'Yesterday'].includes(j.dateDisplay) || j.dateDisplay.startsWith('Apr'));
     return this.all();
   });
 
   async ngOnInit(): Promise<void> {
-    const [jobs, stats] = await Promise.all([
-      this.service.getHistory(),
-      this.service.getStats(),
-    ]);
-    this.all.set(jobs);
-    this.stats.set(stats);
-    this.isLoading.set(false);
+    try {
+      const [jobs, stats] = await Promise.all([
+        this.service.getHistory(),
+        this.service.getStats(),
+      ]);
+      this.all.set(jobs);
+      this.stats.set(stats);
+    } catch {
+      // interceptor handles error toast
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   outcomeClass(outcome: HistoryJob['outcome']): string {

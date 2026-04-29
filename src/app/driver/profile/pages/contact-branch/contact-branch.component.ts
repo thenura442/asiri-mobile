@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { DriverProfileService } from '../../services/driver-profile.service';
 import { DriverProfile } from '../../models/driver-profile.model';
@@ -10,15 +10,19 @@ import { DriverProfile } from '../../models/driver-profile.model';
   templateUrl: './contact-branch.component.html',
   styleUrls: ['./contact-branch.component.scss'],
 })
-export class ContactBranchComponent {
+export class ContactBranchComponent implements OnInit {
   private profileService = inject(DriverProfileService);
   private router         = inject(Router);
 
   profile = signal<DriverProfile | null>(null);
 
   async ngOnInit(): Promise<void> {
-    const data = await this.profileService.getProfile();
-    this.profile.set(data);
+    try {
+      const data = await this.profileService.getProfile();
+      this.profile.set(data);
+    } catch {
+      // interceptor handles error toast
+    }
   }
 
   onCall(phone: string): void {

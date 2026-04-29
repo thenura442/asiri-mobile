@@ -1,9 +1,7 @@
 export type JobStatus =
-  | 'en_route'
-  | 'arrived'
-  | 'collecting'
-  | 'returning'
-  | 'delivered';
+  | 'allocated' | 'dispatched'
+  | 'en_route' | 'arrived' | 'collecting' | 'collected'
+  | 'returning' | 'at_center';
 
 export interface JobTest {
   id:         string;
@@ -14,25 +12,25 @@ export interface JobTest {
 }
 
 export interface PatientInfo {
-  id:                  string;
-  initials:            string;
-  fullName:            string;
-  gender:              string;
-  ageYears:            number;
-  uhid:                string;
-  phone:               string;
-  flag:                'vip' | 'regular' | 'new';
-  address:             string;
-  landmark?:           string;
+  id:                   string;
+  initials:             string;
+  fullName:             string;
+  gender:               string;
+  ageYears:             number;
+  uhid:                 string;
+  phone:                string;
+  flag:                 'vip' | 'regular' | 'new';
+  address:              string;
+  landmark?:            string;
   specialInstructions?: string;
-  pendingChargesLkr?:  number;
+  pendingChargesLkr?:   number;
 }
 
 export interface VehicleInfo {
-  plate:      string;
-  model:      string;
-  type:       string;
-  branch:     string;
+  plate:       string;
+  model:       string;
+  type:        string;
+  branch:      string;
   branchPhone: string;
 }
 
@@ -52,7 +50,7 @@ export interface ActiveJob {
   requestNumber: string;
   status:        JobStatus;
   isUrgent:      boolean;
-  scheduledAt:   string;   // display string
+  scheduledAt:   string;
   patient:       PatientInfo;
   tests:         JobTest[];
   vehicle:       VehicleInfo;
@@ -61,7 +59,6 @@ export interface ActiveJob {
   timeline:      TimelineStep[];
 }
 
-// Collection result per test
 export type CollectionOutcome = 'pending' | 'collected' | 'failed';
 
 export type FailReason =
@@ -72,8 +69,8 @@ export type FailReason =
   | 'Other';
 
 export interface TestCollectionResult {
-  testId:    string;
-  outcome:   CollectionOutcome;
-  failReason?: FailReason;
-  notes?:    string;
+  testId:       string;
+  outcome:      CollectionOutcome;
+  failReason?:  FailReason;
+  notes?:       string;
 }

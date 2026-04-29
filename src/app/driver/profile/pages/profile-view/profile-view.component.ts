@@ -17,19 +17,22 @@ export class DriverProfileViewComponent implements OnInit {
   private auth           = inject(AuthService);
   private router         = inject(Router);
 
-  profile   = signal<DriverProfile | null>(null);
-  isOnline  = signal(true);
+  profile  = signal<DriverProfile | null>(null);
+  isOnline = signal(true);
 
   async ngOnInit(): Promise<void> {
-    const data = await this.profileService.getProfile();
-    this.profile.set(data);
+    try {
+      const data = await this.profileService.getProfile();
+      this.profile.set(data);
+    } catch {
+      // interceptor handles error toast
+    }
   }
 
-  toggleOnline(): void { this.isOnline.update(v => !v); }
+  toggleOnline():    void { this.isOnline.update(v => !v); }
   goEmergency():     void { this.router.navigate(['/driver/pushed/emergency']); }
   goContactBranch(): void { this.router.navigate(['/driver/pushed/contact-branch']); }
-  goSettings():      void { /* D12 — Batch 6C */ }
-
+  goSettings():      void { this.router.navigate(['/driver/pushed/settings']); }
   async onLogout(): Promise<void> { await this.auth.logout(); }
 
   licenseExpiringSoon(): boolean {

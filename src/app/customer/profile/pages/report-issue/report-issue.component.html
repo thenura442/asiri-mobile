@@ -65,7 +65,8 @@
                 <div class="opt-info">
                   <div class="opt-id">{{ b.requestNumber }}</div>
                   <div class="opt-tests">{{ formatTests(b) }}</div>
-                  <div class="opt-date">{{ b.dateDisplay }}</div>
+                  <!-- line 68: dateDisplay → formatDate(b.date) -->
+                  <div class="opt-date">{{ formatDate(b.date) }}</div>
                 </div>
               </div>
             }

@@ -7,19 +7,19 @@ export const DRIVER_TAB_ROUTES: Routes = [
     loadComponent: () =>
       import('../my-job/pages/active-job/active-job.component').then(m => m.ActiveJobComponent),
   },
-  // {
-  //   path: 'history',
-  //   loadChildren: () =>
-  //     import('../history/history.routes').then(m => m.DRIVER_HISTORY_ROUTES),
-  // },
-  // {
-  //   path: 'alerts',
-  //   loadChildren: () =>
-  //     import('../alerts/alerts.routes').then(m => m.DRIVER_ALERTS_ROUTES),
-  // },
-  // {
-  //   path: 'profile',
-  //   loadChildren: () =>
-  //     import('../profile/profile.routes').then(m => m.DRIVER_PROFILE_ROUTES),
-  // },
+  {
+    path: 'history',
+    loadComponent: () =>
+      import('../history/pages/job-history/job-history.component').then(m => m.JobHistoryComponent),
+  },
+  {
+    path: 'alerts',
+    loadComponent: () =>
+      import('../alerts/pages/notification-list/notification-list.component').then(m => m.NotificationListComponent),
+  },
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('../profile/pages/profile-view/profile-view.component').then(m => m.DriverProfileViewComponent),
+  },
 ];

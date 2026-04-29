@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavController } from '@ionic/angular/standalone';
 import { HomeService } from '../../services/home.service';
 import { CustomerHomeData } from '../../models/home.model';
 import { GreetingHeaderComponent } from '../../components/greeting-header/greeting-header.component';
@@ -11,6 +11,7 @@ import { RecentBookingsListComponent } from '../../components/recent-bookings-li
 @Component({
   selector: 'app-home',
   standalone: true,
+  host: { class: 'ion-page' },
   imports: [
     GreetingHeaderComponent,
     ActiveBookingCardComponent,
@@ -23,13 +24,12 @@ import { RecentBookingsListComponent } from '../../components/recent-bookings-li
 })
 export class HomeComponent implements OnInit {
   private homeService = inject(HomeService);
-  private router      = inject(Router);
+  private nav         = inject(NavController);
 
-  homeData    = signal<CustomerHomeData | null>(null);
-  isLoading   = signal(true);
-  sheetOpen   = signal(false);
+  homeData  = signal<CustomerHomeData | null>(null);
+  isLoading = signal(true);
+  sheetOpen = signal(false);
 
-  // Greeting based on time of day
   get greeting(): string {
     const h = new Date().getHours();
     if (h < 12) return 'Good morning,';
@@ -37,65 +37,60 @@ export class HomeComponent implements OnInit {
     return 'Good evening,';
   }
 
-  ngOnInit(): void {
-    this.loadData();
-  }
+  ngOnInit(): void { this.loadData(); }
 
   private async loadData(): Promise<void> {
     try {
       const data = await this.homeService.getHomeData();
       this.homeData.set(data);
     } catch {
-      // In dev / before backend, use mock data so the UI is visible
       this.homeData.set(this.mockData());
     } finally {
       this.isLoading.set(false);
     }
   }
 
-  toggleSheet(): void {
-    this.sheetOpen.update(v => !v);
-  }
+  toggleSheet(): void { this.sheetOpen.update(v => !v); }
 
   onBookTest(): void {
-    this.router.navigate(['/customer/booking/select-tests']);
+    this.nav.navigateRoot('/customer/booking/select-tests');
   }
 
   onTrackBooking(id: string): void {
-    this.router.navigate(['/customer/tabs/bookings/tracking', id]);
+    this.nav.navigateRoot(`/customer/my-bookings/tracking/${id}`);
   }
 
   onViewAllBookings(): void {
-    this.router.navigate(['/customer/tabs/bookings']);
+    this.nav.navigateRoot('/customer/tabs/bookings');
   }
 
   onNotifications(): void {
-    this.router.navigate(['/customer/tabs/notifications']);
+    this.nav.navigateRoot('/customer/tabs/notifications');
   }
 
-  // ── Mock data for development ─────────────────────────────────────
   private mockData(): CustomerHomeData {
     return {
       profile: { fullName: 'Kavindi Perera', firstName: 'Kavindi', avatarUrl: null },
       stats: { totalBookings: 12, totalReports: 7, activeBookings: 1 },
       pendingCharges: 450,
+      pendingChargeReason: 'Late cancellation fee',
       activeBooking: {
-        id: 'abc123',
+        id:            'abc123',
         requestNumber: 'REQ-2026-0847',
-        statusLabel: 'En Route',
-        tests: ['Full Blood Count', 'HbA1c', 'Lipid Profile'],
-        etaMinutes: 12,
-        location: 'Colombo 07',
-        driverName: 'Kamal S.',
-        progressStep: 1,
+        status:        'en_route',
+        tests:         ['Full Blood Count', 'HbA1c', 'Lipid Profile'],
+        testCount:     3,
+        etaMinutes:    12,
+        location:      'Colombo 07',
+        driverName:    'Kamal S.',
       },
       recentBookings: [
-        { id: 'r1', requestNumber: 'REQ-0831', testNames: ['Lipid Profile', 'TSH'],
-          date: '2026-04-08', amountLkr: 4850, status: 'completed' },
-        { id: 'r2', requestNumber: 'REQ-0819', testNames: ['Urine Culture'],
-          date: '2026-04-06', amountLkr: 2200, status: 'processing' },
-        { id: 'r3', requestNumber: 'REQ-0798', testNames: ['Full Blood Count'],
-          date: '2026-04-02', amountLkr: 1500, status: 'cancelled' },
+        { id: 'r1', requestNumber: 'REQ-0831', tests: ['Lipid Profile', 'TSH'],
+          testCount: 2, date: '2026-04-08T00:00:00.000Z', totalPrice: 4850, status: 'completed' },
+        { id: 'r2', requestNumber: 'REQ-0819', tests: ['Urine Culture'],
+          testCount: 1, date: '2026-04-06T00:00:00.000Z', totalPrice: 2200, status: 'processing' },
+        { id: 'r3', requestNumber: 'REQ-0798', tests: ['Full Blood Count'],
+          testCount: 1, date: '2026-04-02T00:00:00.000Z', totalPrice: 1500, status: 'cancelled' },
       ],
     };
   }

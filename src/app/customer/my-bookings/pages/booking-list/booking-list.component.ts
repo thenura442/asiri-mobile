@@ -1,19 +1,19 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent, NavController } from '@ionic/angular/standalone';
 import { MyBookingsService } from '../../services/my-bookings.service';
 import { BookingListItem, FilterTab, BookingStatus } from '../../models/my-bookings.model';
 
 @Component({
   selector: 'app-booking-list',
   standalone: true,
+  host: { class: 'ion-page' },
   imports: [IonContent],
   templateUrl: './booking-list.component.html',
   styleUrls: ['./booking-list.component.scss'],
 })
 export class BookingListComponent implements OnInit {
   private service = inject(MyBookingsService);
-  private router  = inject(Router);
+  private nav     = inject(NavController);
 
   all        = signal<BookingListItem[]>([]);
   activeTab  = signal<FilterTab>('All');
@@ -21,7 +21,9 @@ export class BookingListComponent implements OnInit {
 
   readonly tabs: FilterTab[] = ['All', 'Active', 'Completed', 'Cancelled'];
 
-  private readonly ACTIVE_STATUSES:    BookingStatus[] = ['en_route', 'pending', 'assigned', 'arrived', 'collecting'];
+  private readonly ACTIVE_STATUSES: BookingStatus[] = [
+    'en_route', 'pending', 'assigned', 'allocated', 'accepted', 'dispatched', 'arrived', 'collecting'
+  ];
   private readonly COMPLETED_STATUSES: BookingStatus[] = ['completed', 'processing', 'collected'];
   private readonly CANCELLED_STATUSES: BookingStatus[] = ['cancelled'];
 
@@ -44,19 +46,17 @@ export class BookingListComponent implements OnInit {
     return 0;
   }
 
-  isActive(b: BookingListItem): boolean {
-    return this.ACTIVE_STATUSES.includes(b.status);
-  }
-
-  isEnRoute(b: BookingListItem): boolean {
-    return b.status === 'en_route';
-  }
+  isActive(b: BookingListItem):  boolean { return this.ACTIVE_STATUSES.includes(b.status); }
+  isEnRoute(b: BookingListItem): boolean { return b.status === 'en_route'; }
 
   statusClass(status: BookingStatus): string {
     const map: Record<BookingStatus, string> = {
       en_route:   'badge--enroute',
       pending:    'badge--pending',
       assigned:   'badge--pending',
+      allocated:  'badge--pending',
+      accepted:   'badge--pending',
+      dispatched: 'badge--enroute',
       arrived:    'badge--enroute',
       collecting: 'badge--enroute',
       collected:  'badge--proc',
@@ -72,6 +72,9 @@ export class BookingListComponent implements OnInit {
       en_route:   'En Route',
       pending:    'Pending',
       assigned:   'Assigned',
+      allocated:  'badge--pending',
+      accepted:   'badge--pending',
+      dispatched: 'badge--enroute',
       arrived:    'Arrived',
       collecting: 'Collecting',
       collected:  'Collected',
@@ -82,36 +85,40 @@ export class BookingListComponent implements OnInit {
     return map[status] ?? status;
   }
 
-  displayTests(b: BookingListItem): string {
-    return b.testNames.slice(0, 2).join(', ');
+  displayTests(b: BookingListItem): string { return b.tests.slice(0, 2).join(', '); }
+  extraTests(b: BookingListItem):   number  { return Math.max(0, b.tests.length - 2); }
+
+  formatDate(iso: string): string {
+    return new Date(iso).toLocaleDateString('en-LK', {
+      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
   }
 
-  extraTests(b: BookingListItem): number {
-    return Math.max(0, b.testNames.length - 2);
-  }
-
-  formatPrice(p: number): string {
-    return `Rs. ${p.toLocaleString('en-LK')}`;
-  }
+  formatPrice(p: number): string { return `Rs. ${p.toLocaleString('en-LK')}`; }
 
   async ngOnInit(): Promise<void> {
-    const data = await this.service.getBookings();
-    this.all.set(data);
-    this.isLoading.set(false);
+    try {
+      const data = await this.service.getBookings();
+      this.all.set(data);
+    } catch {
+      // interceptor handles error toast
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   setTab(tab: FilterTab): void { this.activeTab.set(tab); }
 
   openDetail(id: string): void {
-    this.router.navigate(['/customer/my-bookings/detail', id]);
+    this.nav.navigateRoot(`/customer/my-bookings/detail/${id}`);
   }
 
   trackBooking(id: string, event: Event): void {
     event.stopPropagation();
-    this.router.navigate(['/customer/my-bookings/tracking', id]);
+    this.nav.navigateRoot(`/customer/my-bookings/tracking/${id}`);
   }
 
   onBookNew(): void {
-    this.router.navigate(['/customer/booking/select-tests']);
+    this.nav.navigateRoot('/customer/booking/select-tests');
   }
 }

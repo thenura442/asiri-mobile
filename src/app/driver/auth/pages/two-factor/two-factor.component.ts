@@ -28,11 +28,9 @@ export class TwoFactorComponent implements OnInit {
     const val = input.value.replace(/\D/, '').slice(0, 1);
     input.value = val;
     this.otpValues[index] = val;
-
     if (val && index < 5) {
       this.otpInputs.toArray()[index + 1]?.nativeElement.focus();
     }
-
     if (this.otpValues.every(v => v !== '')) {
       this.onVerify();
     }
@@ -48,14 +46,17 @@ export class TwoFactorComponent implements OnInit {
 
   async onVerify(): Promise<void> {
     const code = this.otpValues.join('');
-    if (code.length < 6) { await this.toast.showError('Please enter all 6 digits.'); return; }
+    if (code.length < 6) {
+      await this.toast.showError('Please enter all 6 digits.');
+      return;
+    }
     this.isLoading = true;
     try {
       await this.auth.verifyTwoFactor({ code });
+      await this.toast.showSuccess('Verified! Welcome back.');
       this.router.navigate(['/driver/tabs/my-job'], { replaceUrl: true });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Invalid code. Please try again.';
-      await this.toast.showError(msg);
+    } catch {
+      // interceptor handles error toast
       this.otpValues = ['', '', '', '', '', ''];
       this.otpInputs.toArray().forEach(i => (i.nativeElement.value = ''));
       this.otpInputs.first?.nativeElement.focus();

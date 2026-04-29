@@ -1,12 +1,12 @@
 export interface TestCatalogItem {
-  id:                    string;
-  name:                  string;
-  code:                  string;
-  priceRs:               number;
-  sampleType:            'blood' | 'urine';
-  turnaround:            string;   // e.g. "4–6 hrs"
-  requiresPrescription:  boolean;
-  category:              string;   // e.g. "Blood", "Urine", "Hormone"
+  id:              string;
+  name:            string;
+  code:            string;
+  price:           number;
+  sampleType:      'blood' | 'urine';
+  turnaroundTime:  string | null;
+  prescriptionReq: boolean;
+  timeSensitivityHrs: number | null;
 }
 
 export interface SelectedTest extends TestCatalogItem {

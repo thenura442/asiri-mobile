@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent, NavController } from '@ionic/angular/standalone';
+import { ActivatedRoute } from '@angular/router';
 import { JobService } from '../../services/job.service';
 import { ActiveJob } from '../../models/job-model';
 import { TitleCasePipe } from '@angular/common';
@@ -14,8 +14,8 @@ import { TitleCasePipe } from '@angular/common';
 })
 export class JobDetailComponent implements OnInit {
   private jobService = inject(JobService);
+  private nav        = inject(NavController);
   private route      = inject(ActivatedRoute);
-  private router     = inject(Router);
 
   job       = signal<ActiveJob | null>(null);
   isLoading = signal(true);
@@ -23,15 +23,30 @@ export class JobDetailComponent implements OnInit {
   status = this.jobService.currentJobStatus;
 
   async ngOnInit(): Promise<void> {
-    const data = await this.jobService.getActiveJob();
-    this.job.set(data);
-    this.isLoading.set(false);
+    const id = this.route.snapshot.paramMap.get('id');
+    try {
+      if (id) {
+        const data = await this.jobService.getJobDetail(id);
+        this.job.set(data);
+        if (data) this.jobService.currentJobStatus.set(data.status as any);
+      }
+    } catch {
+      // interceptor handles error toast
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   statusLabel(): string {
     const map: Record<string, string> = {
-      en_route: 'En Route', arrived: 'Arrived',
-      collecting: 'Collecting', returning: 'Returning', delivered: 'Delivered',
+      allocated:  'Allocated',
+      dispatched: 'Dispatched',
+      en_route:   'En Route',
+      arrived:    'Arrived',
+      collecting: 'Collecting',
+      collected:  'Collected',
+      returning:  'Returning',
+      at_center:  'At Center',
     };
     return map[this.status()] ?? 'En Route';
   }
@@ -40,5 +55,7 @@ export class JobDetailComponent implements OnInit {
     return `Rs. ${n.toLocaleString('en-LK')}`;
   }
 
-  goBack(): void { this.router.navigate(['/driver/tabs/my-job']); }
+  goBack(): void {
+    this.nav.back();
+  }
 }

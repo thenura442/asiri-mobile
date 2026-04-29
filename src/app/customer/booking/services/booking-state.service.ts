@@ -15,18 +15,18 @@ export class BookingStateService {
   });
 
   // ── Computed read selectors ───────────────────────────────────────
-  tests          = computed(() => this.state().tests);
-  selectedTests  = computed(() => this.state().tests.filter(t => t.selected));
-  location       = computed(() => this.state().location);
-  schedule       = computed(() => this.state().schedule);
+  tests           = computed(() => this.state().tests);
+  selectedTests   = computed(() => this.state().tests.filter(t => t.selected));
+  location        = computed(() => this.state().location);
+  schedule        = computed(() => this.state().schedule);
   prescriptionUrl = computed(() => this.state().prescriptionUrl);
 
   requiresPrescription = computed(() =>
-    this.selectedTests().some(t => t.requiresPrescription)
+    this.selectedTests().some(t => t.prescriptionReq)
   );
 
   priceBreakdown = computed((): PriceBreakdown => {
-    const testTotal    = this.selectedTests().reduce((sum, t) => sum + t.priceRs, 0);
+    const testTotal    = this.selectedTests().reduce((sum, t) => sum + Number(t.price), 0);
     const transportFee = 350;
     return { testTotal, transportFee, total: testTotal + transportFee };
   });

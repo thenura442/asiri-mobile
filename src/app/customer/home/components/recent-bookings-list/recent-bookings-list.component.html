@@ -65,7 +65,8 @@
 
         <!-- Right: price + badge -->
         <div class="card-right">
-          <div class="card-price">{{ formatAmount(b.amountLkr) }}</div>
+          <!-- Replace card-price line -->
+          <div class="card-price">{{ formatAmount(b.totalPrice) }}</div>
           <div class="status-badge"
                [class.status-badge--done]="b.status === 'completed'"
                [class.status-badge--proc]="b.status === 'processing'"

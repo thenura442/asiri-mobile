@@ -20,7 +20,15 @@
       </div>
     </div>
 
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner" aria-label="Loading report"></div>
+        <p>Loading report...</p>
+      </div>
+    }
+
     @if (detail(); as d) {
+
       <!-- Metadata chips -->
       <div class="meta-bar" role="note">
         <div class="meta-chip">
@@ -39,7 +47,7 @@
         </div>
       </div>
 
-      <!-- PDF Viewer simulation -->
+      <!-- PDF Viewer / Results -->
       <div class="pdf-viewer">
         <div class="pdf-content">
           <div class="pdf-watermark" aria-hidden="true">ASIRI</div>
@@ -60,34 +68,75 @@
           <!-- Patient info -->
           <div class="pdf-section-title">Patient Information</div>
           <div class="pdf-row"><span class="pdf-label">Patient Name</span><span class="pdf-value">{{ d.patientName }}</span></div>
-          <div class="pdf-row"><span class="pdf-label">UHID</span><span class="pdf-value pdf-value--mono">ASR-0042</span></div>
           <div class="pdf-row"><span class="pdf-label">Age / Gender</span><span class="pdf-value">{{ d.patientAge }} / {{ d.patientGender }}</span></div>
           <div class="pdf-row"><span class="pdf-label">Collected</span><span class="pdf-value pdf-value--mono">{{ d.collectedAt }}</span></div>
           <div class="pdf-row"><span class="pdf-label">Reported</span><span class="pdf-value pdf-value--mono">{{ d.reportedAt }}</span></div>
 
-          <!-- Result sections -->
-          @for (section of d.sections; track section.title) {
-            <div class="pdf-results-section">
-              <div class="pdf-results-title">{{ section.title }}</div>
-              @for (r of section.results; track r.testName) {
-                <div class="pdf-result">
-                  <div class="pdf-result-left">
-                    <div class="pdf-flag"
-                         [style.background]="flagColor(r.flag)"
-                         [attr.aria-label]="r.flag">
+          <!-- Structured results (mock/local data) -->
+          @if (hasStructuredResults()) {
+            @for (section of d.sections; track section.title) {
+              <div class="pdf-results-section">
+                <div class="pdf-results-title">{{ section.title }}</div>
+                @for (r of section.results; track r.testName) {
+                  <div class="pdf-result">
+                    <div class="pdf-result-left">
+                      <div class="pdf-flag"
+                           [style.background]="flagColor(r.flag)"
+                           [attr.aria-label]="r.flag">
+                      </div>
+                      <span class="pdf-test-name">{{ r.testName }}</span>
                     </div>
-                    <span class="pdf-test-name">{{ r.testName }}</span>
-                  </div>
-                  <div class="pdf-result-right">
-                    <div class="pdf-test-result" [style.color]="valueColor(r.flag)">
-                      {{ r.value }} {{ r.unit }}
+                    <div class="pdf-result-right">
+                      <div class="pdf-test-result" [style.color]="valueColor(r.flag)">
+                        {{ r.value }} {{ r.unit }}
+                      </div>
+                      <div class="pdf-test-range">{{ r.range }}</div>
                     </div>
-                    <div class="pdf-test-range">{{ r.range }}</div>
                   </div>
+                }
+              </div>
+            }
+          }
+
+          <!-- Per-test PDF links (real API data) -->
+          @if (!hasStructuredResults() && hasPerTestPdfs()) {
+            <div class="pdf-section-title" style="margin-top: 20px">Test Reports</div>
+            @for (t of d.tests; track t.id) {
+              @if (t.reportUrl) {
+                <div class="pdf-test-row">
+                  <div class="pdf-test-row-info">
+                    <span class="pdf-test-name">{{ t.name }}</span>
+                    <span class="pdf-test-code">{{ t.code }}</span>
+                    @if (t.isCriticalValue) {
+                      <span class="critical-badge">Critical Value</span>
+                    }
+                  </div>
+                  <button class="pdf-test-dl" type="button"
+                          (click)="onDownloadTest(t.reportUrl!)"
+                          aria-label="Download {{ t.name }} report">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    PDF
+                  </button>
                 </div>
               }
+            }
+          }
+
+          <!-- Processing state — no results yet -->
+          @if (!hasStructuredResults() && !hasPerTestPdfs()) {
+            <div class="processing-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <p>Your report is being processed. You'll be notified when it's ready.</p>
             </div>
           }
+
         </div>
 
         <div class="zoom-hint" aria-hidden="true">
@@ -102,23 +151,25 @@
       </div>
 
       <!-- Download + Share actions -->
-      <div class="bottom-actions">
-        <button class="btn-download" type="button" (click)="onDownload()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          <span>Download PDF</span>
-        </button>
-        <button class="btn-share" type="button" (click)="onShare()" aria-label="Share">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-          </svg>
-        </button>
-      </div>
+      @if (d.status === 'ready') {
+        <div class="bottom-actions">
+          <button class="btn-download" type="button" (click)="onDownload()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span>Download PDF</span>
+          </button>
+          <button class="btn-share" type="button" (click)="onShare()" aria-label="Share">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+          </button>
+        </div>
+      }
     }
 
     <div style="height: 32px" aria-hidden="true"></div>

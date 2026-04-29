@@ -11,9 +11,13 @@
       <h1>Upload Prescription</h1>
     </div>
 
+    <!-- Hidden file input -->
+    <input #fileInput type="file" accept="image/jpeg,image/png,application/pdf"
+           style="display:none" (change)="onFileSelected($event)" />
+
     <div class="content">
 
-      <!-- Blue info card: which tests need Rx -->
+      <!-- Info card: which tests need Rx -->
       <div class="info-card" role="note" aria-label="Tests requiring prescription">
         <div class="info-card__title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -40,28 +44,41 @@
 
         @if (!uploaded()) {
           <!-- Upload zone -->
-          <button class="upload-zone" type="button" (click)="onUpload()"
+          <button class="upload-zone" type="button" (click)="onUploadClick()"
+                  [disabled]="isLoading()"
                   aria-label="Take photo or upload prescription">
-            <div class="upload-zone__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-                <circle cx="12" cy="13" r="4"/>
-              </svg>
-            </div>
-            <h3>Take Photo or Upload</h3>
-            <p>Tap to open camera or select from files</p>
-            <span class="upload-hint">JPG, PNG — max 10MB</span>
+            @if (isLoading()) {
+              <div class="upload-zone__icon" aria-hidden="true">
+                <span class="spinner"></span>
+              </div>
+              <h3>Uploading...</h3>
+            } @else {
+              <div class="upload-zone__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                  <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </div>
+              <h3>Take Photo or Upload</h3>
+              <p>Tap to open camera or select from files</p>
+              <span class="upload-hint">JPG, PNG, PDF — max 10MB</span>
+            }
           </button>
         } @else {
           <!-- Uploaded preview -->
           <div class="uploaded-preview" role="status" aria-label="Prescription uploaded">
             <div class="preview-thumb">
-              <div class="preview-thumb-img" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                </svg>
-              </div>
+              @if (fileUrl() && isImageFile) {
+                <img [src]="fileUrl()" alt="Prescription preview"
+                     class="preview-thumb-img preview-thumb-img--photo" />
+              } @else {
+                <div class="preview-thumb-img" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                </div>
+              }
               <button class="preview-remove" (click)="removeFile()" aria-label="Remove prescription">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                   <path d="M18 6L6 18M6 6l12 12"/>
@@ -79,11 +96,15 @@
                 Uploaded
               </div>
             </div>
+            <!-- Tap to change -->
+            <button class="preview-change" type="button" (click)="onUploadClick()">
+              Change
+            </button>
           </div>
         }
       </div>
 
-      <!-- Photo tips card -->
+      <!-- Photo tips -->
       <div class="tips-card">
         <div class="tips-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"

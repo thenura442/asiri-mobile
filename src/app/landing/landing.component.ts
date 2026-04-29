@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
 import { IonContent } from '@ionic/angular/standalone';
 import { NgStyle } from '@angular/common';
+import { NavController } from '@ionic/angular/standalone';
 
 interface Particle {
   left: number;
@@ -13,16 +13,13 @@ interface Particle {
 @Component({
   selector: 'app-landing',
   standalone: true,
+  host: { class: 'ion-page' },
   imports: [IonContent, NgStyle],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent {
-  private router = new Router();
-
-  constructor(private _router: Router) {
-    this.router = _router;
-  }
+  private nav = inject(NavController);
 
   readonly particles: Particle[] = [
     { left: 12, bottom: 20, dur: 4,   delay: 0   },
@@ -47,10 +44,10 @@ export class LandingComponent {
   }
 
   goToCustomer(): void {
-    this.router.navigate(['/customer/auth/login']);
+    this.nav.navigateRoot('/customer/auth/login');
   }
 
   goToDriver(): void {
-    this.router.navigate(['/driver/auth/login']);
+    this.nav.navigateRoot('/driver/auth/login');
   }
 }

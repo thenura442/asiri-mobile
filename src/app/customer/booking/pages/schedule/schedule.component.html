@@ -29,28 +29,28 @@
             </svg>
           </div>
           <div class="branch-info">
-            <div class="branch-name">{{ branch.name }}</div>
+            <div class="branch-name">{{ branch().name }}</div>
             <div class="branch-dist">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
                 <circle cx="12" cy="10" r="3"/>
               </svg>
-              {{ branch.distKm }} km away
+              {{ branch().distKm }} km away
             </div>
           </div>
           <div class="branch-badge" aria-label="Closest branch">Closest</div>
         </div>
         <div class="branch-eta">
           <div class="eta-chip">
-            <strong>~{{ branch.etaMin }} min</strong>
+            <strong>~{{ branch().etaMin }} min</strong>
             <small>Travel ETA</small>
           </div>
           <div class="eta-chip">
-            <strong>~{{ branch.totalMin }} min</strong>
+            <strong>~{{ branch().totalMin }} min</strong>
             <small>Total Time</small>
           </div>
           <div class="eta-chip">
-            <strong>{{ branch.traffic }}</strong>
+            <strong>{{ branch().traffic }}</strong>
             <small>Traffic Now</small>
           </div>
         </div>

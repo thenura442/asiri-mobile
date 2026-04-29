@@ -1,6 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet, NavController } from '@ionic/angular/standalone';
 import { StorageService } from './shared/services/storage.service';
+import { AuthService } from './shared/services/auth.service';
+import { AuthUser } from './shared/models/auth.model';
 
 @Component({
   selector: 'app-root',
@@ -12,13 +14,16 @@ import { StorageService } from './shared/services/storage.service';
 export class AppComponent implements OnInit {
   private storage = inject(StorageService);
   private nav     = inject(NavController);
+  private auth    = inject(AuthService);
 
   async ngOnInit() {
-    const token    = await this.storage.get('access_token');
-    const userJson = await this.storage.get('user');
+    // Load user into auth signal first
+    await this.auth.loadSession();
 
-    if (token && userJson) {
-      const user = JSON.parse(userJson) as { role: string };
+    const token = await this.storage.get<string>('accessToken');
+    const user  = await this.storage.get<AuthUser>('authUser');
+
+    if (token && user) {
       const destination = user.role === 'driver'
         ? '/driver/tabs/my-job'
         : '/customer/tabs/home';

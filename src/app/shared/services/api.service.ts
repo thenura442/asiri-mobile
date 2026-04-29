@@ -7,11 +7,11 @@ import { ApiResponse } from '../models/api-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private http = inject(HttpClient);
+  private http    = inject(HttpClient);
   private storage = inject(StorageService);
 
   private async getHeaders(): Promise<HttpHeaders> {
-    const token = await this.storage.get('access_token');
+    const token = await this.storage.get<string>('accessToken'); // ← fixed key
     return new HttpHeaders({
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { ActivatedRoute } from '@angular/router';
+import { IonContent, NavController } from '@ionic/angular/standalone';
 import { MyBookingsService } from '../../services/my-bookings.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import { BookingDetail, TimelineStep } from '../../models/my-bookings.model';
 
 @Component({
@@ -14,26 +15,32 @@ import { BookingDetail, TimelineStep } from '../../models/my-bookings.model';
 export class LiveTrackingComponent implements OnInit, OnDestroy {
   private service = inject(MyBookingsService);
   private route   = inject(ActivatedRoute);
-  private router  = inject(Router);
+  private nav     = inject(NavController);
+  private toast   = inject(ToastService);
 
-  detail    = signal<BookingDetail | null>(null);
-  etaMinutes = signal(12);
-  isLoading = signal(true);
+  detail       = signal<BookingDetail | null>(null);
+  etaMinutes   = signal(12);
+  isLoading    = signal(true);
+  isCancelling = signal(false);
 
-  // Simulated ETA countdown
   private etaInterval?: ReturnType<typeof setInterval>;
+  private bookingId = '';
 
   async ngOnInit(): Promise<void> {
-    const id = this.route.snapshot.paramMap.get('id') ?? '';
-    const data = await this.service.getDetail(id);
-    this.detail.set(data);
-    this.etaMinutes.set(data.etaMinutes ?? 12);
-    this.isLoading.set(false);
+    this.bookingId = this.route.snapshot.paramMap.get('id') ?? '';
+    try {
+      const data = await this.service.getDetail(this.bookingId);
+      this.detail.set(data);
+      this.etaMinutes.set(data.etaMinutes ?? 12);
 
-    // Simulate ETA countdown for demo
-    this.etaInterval = setInterval(() => {
-      this.etaMinutes.update(v => Math.max(0, v - 1));
-    }, 60000);
+      this.etaInterval = setInterval(() => {
+        this.etaMinutes.update(v => Math.max(0, v - 1));
+      }, 60000);
+    } catch {
+      // interceptor handles error toast
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   ngOnDestroy(): void {
@@ -44,9 +51,19 @@ export class LiveTrackingComponent implements OnInit, OnDestroy {
   timeline      = (): TimelineStep[] => this.detail()?.timeline ?? [];
   driver        = () => this.detail()?.driver ?? null;
 
-  onCancel(): void {
-    // In production: show confirm modal
+  async onCancel(): Promise<void> {
+    if (!this.bookingId) return;
+    this.isCancelling.set(true);
+    try {
+      await this.service.cancelBooking(this.bookingId);
+      await this.toast.showSuccess('Booking cancelled successfully.');
+      this.nav.navigateRoot('/customer/tabs/bookings');
+    } catch {
+      // interceptor handles error toast
+    } finally {
+      this.isCancelling.set(false);
+    }
   }
 
-  goBack(): void { this.router.navigate(['/customer/tabs/bookings']); }
+  goBack(): void { this.nav.back(); }
 }

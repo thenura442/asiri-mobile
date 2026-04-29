@@ -67,7 +67,7 @@
             <div class="bk-top">
               <div>
                 <div class="bk-id">{{ b.requestNumber }}</div>
-                <div class="bk-date">{{ b.dateDisplay }}</div>
+                <div class="bk-date">{{ formatDate(b.date) }}</div>
               </div>
               <div class="bk-badge" [class]="statusClass(b.status)">
                 <i aria-hidden="true"></i>
@@ -93,7 +93,7 @@
                 </svg>
                 {{ b.location }}
               </div>
-              <div class="bk-price">{{ formatPrice(b.amountLkr) }}</div>
+              <div class="bk-price">{{ formatPrice(b.totalPrice) }}</div>
             </div>
 
             <!-- Track Live CTA — only for en_route -->

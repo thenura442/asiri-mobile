@@ -39,6 +39,9 @@
           </svg>
           Reports will be emailed here
         </p>
+        @if (isInvalid('email')) {
+          <span class="field-error" role="alert">Enter a valid email address</span>
+        }
       </div>
 
       <!-- Emergency contact name -->
@@ -66,6 +69,9 @@
                  placeholder="7X XXX XXXX" inputmode="tel"
                  [class.inp--error]="isInvalid('emergencyContactPhone')"/>
         </div>
+        @if (isInvalid('emergencyContactPhone')) {
+          <span class="field-error" role="alert">Enter a valid mobile number</span>
+        }
       </div>
 
       <!-- Address -->

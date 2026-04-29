@@ -1,35 +1,42 @@
 import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular/standalone';
 import { AuthService } from '../../../../shared/services/auth.service';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { AuthUser } from 'src/app/shared/models/auth.model';
 
 @Component({
   selector: 'app-otp-verify',
   standalone: true,
+  host: { class: 'ion-page' },
   imports: [IonContent],
   templateUrl: './otp-verify.component.html',
   styleUrls: ['./otp-verify.component.scss'],
 })
 export class OtpVerifyComponent implements OnInit, OnDestroy {
-  private auth   = inject(AuthService);
-  private toast  = inject(ToastService);
-  private router = inject(Router);
+  private auth  = inject(AuthService);
+  private toast = inject(ToastService);
+  private nav   = inject(NavController);
 
   @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
-  phone       = '';
-  otpValues   = ['', '', '', '', '', ''];
-  isLoading   = false;
-  timerSecs   = 120;
+  phone        = '';
+  accessToken  = '';
+  refreshToken = '';
+  user: AuthUser | null = null;
+
+  otpValues    = ['', '', '', '', '', ''];
+  isLoading    = false;
+  timerSecs    = 120;
   timerDisplay = '02:00';
-  canResend   = false;
+  canResend    = false;
   private interval?: ReturnType<typeof setInterval>;
 
   ngOnInit(): void {
-    // Phone passed via router state from registration/login
-    const nav = this.router.getCurrentNavigation();
-    this.phone = (nav?.extras?.state?.['phone'] as string) ?? history.state?.phone ?? '';
+    this.phone        = history.state?.phone        ?? '';
+    this.accessToken  = history.state?.accessToken  ?? '';
+    this.refreshToken = history.state?.refreshToken ?? '';
+    this.user         = history.state?.user         ?? null;
     this.startTimer();
   }
 
@@ -53,20 +60,18 @@ export class OtpVerifyComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  onInput(event: Event, index: number): void {
-    const input = event.target as HTMLInputElement;
-    const val = input.value.replace(/\D/, '').slice(0, 1);
-    input.value = val;
-    this.otpValues[index] = val;
-
-    if (val && index < 5) {
-      this.otpInputs.toArray()[index + 1]?.nativeElement.focus();
-    }
-
-    if (this.otpValues.every(v => v !== '')) {
-      this.onVerify();
-    }
-  }
+  // onInput(event: Event, index: number): void {
+  //   const input = event.target as HTMLInputElement;
+  //   const val = input.value.replace(/\D/, '').slice(0, 1);
+  //   input.value = val;
+  //   this.otpValues[index] = val;
+  //   if (val && index < 5) {
+  //     this.otpInputs.toArray()[index + 1]?.nativeElement.focus();
+  //   }
+  //   if (this.otpValues.every(v => v !== '')) {
+  //     this.onVerify();
+  //   }
+  // }
 
   onKeydown(event: KeyboardEvent, index: number): void {
     if (event.key === 'Backspace' && !this.otpValues[index] && index > 0) {
@@ -76,23 +81,33 @@ export class OtpVerifyComponent implements OnInit, OnDestroy {
     }
   }
 
-  async onVerify(): Promise<void> {
-    const code = this.otpValues.join('');
-    if (code.length < 6) { await this.toast.showError('Please enter all 6 digits.'); return; }
-    this.isLoading = true;
-    try {
-      await this.auth.verifyOtp({ phone: this.phone, code });
-      this.router.navigate(['/customer/tabs/home'], { replaceUrl: true });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Invalid code. Please try again.';
-      await this.toast.showError(msg);
-      this.otpValues = ['', '', '', '', '', ''];
-      this.otpInputs.toArray().forEach(i => (i.nativeElement.value = ''));
-      this.otpInputs.first?.nativeElement.focus();
-    } finally {
-      this.isLoading = false;
-    }
-  }
+  // async onVerify(): Promise<void> {
+  //   const code = this.otpValues.join('');
+  //   if (code.length < 6) {
+  //     await this.toast.showError('Please enter all 6 digits.');
+  //     return;
+  //   }
+  //   this.isLoading = true;
+  //   try {
+  //     await this.auth.verifyOtp({ phone: this.phone, code });
+  //     // Save tokens only after OTP confirmed
+  //     if (this.accessToken && this.refreshToken && this.user) {
+  //       await this.auth.completeRegistration(
+  //         this.accessToken,
+  //         this.refreshToken,
+  //         this.user,
+  //       );
+  //     }
+  //     await this.toast.showSuccess('Phone verified! Welcome to Asiri.');
+  //     this.nav.navigateRoot('/customer/tabs/home');
+  //   } catch {
+  //     this.otpValues = ['', '', '', '', '', ''];
+  //     this.otpInputs.toArray().forEach(i => (i.nativeElement.value = ''));
+  //     this.otpInputs.first?.nativeElement.focus();
+  //   } finally {
+  //     this.isLoading = false;
+  //   }
+  // }
 
   async onResend(): Promise<void> {
     if (!this.canResend) return;
@@ -101,7 +116,7 @@ export class OtpVerifyComponent implements OnInit, OnDestroy {
       await this.toast.showSuccess('New code sent!');
       this.startTimer();
     } catch {
-      await this.toast.showError('Failed to resend. Please try again.');
+      // interceptor handles error toast
     }
   }
 
@@ -110,5 +125,7 @@ export class OtpVerifyComponent implements OnInit, OnDestroy {
     return this.phone.replace(/(\+94)(\d{2})(\d+)(\d{4})/, '$1 $2 ••• $4');
   }
 
-  goBack(): void { this.router.navigate(['/customer/auth/register']); }
+  goBack(): void {
+    this.nav.navigateRoot('/customer/auth/register');
+  }
 }
